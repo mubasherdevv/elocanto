@@ -1,0 +1,19 @@
+
+elocanto
+analyze the project and in localhost email setup is work but in this my website ( https://elocanto.up.railway.app/ ) show some error ( SEO Content load error: AxiosError: Network Error
+    at j.onerror (index-DbsL-IKL.js:13:6331)
+    at oo.request (index-DbsL-IKL.js:15:2094)
+    at async index-DbsL-IKL.js:16:18219
+(anonymous) @ index-DbsL-IKL.js:16Understand this error
+api/seo/match?pageType=login&slug=:1  Failed to load resource: net::ERR_CONNECTION_TIMED_OUTUnderstand this error
+index-DbsL-IKL.js:16 SEO Content load error: AxiosError: Network Error
+    at j.onerror (index-DbsL-IKL.js:13:6331)
+    at oo.request (index-DbsL-IKL.js:15:2094)
+    at async index-DbsL-IKL.js:16:18219
+(anonymous) @ index-DbsL-IKL.js:16Understand this error
+api/seo/match?pageType=forgot-password&slug=:1  Failed to load resource: net::ERR_CONNECTION_TIMED_OUTUnderstand this error
+20:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+forgot-password:1 Unchecked runtime.lastError: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was receivedUnderstand this error
+forgot-password:1 Unchecked runtime.lastError: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was receivedUnderstand this error
+forgot-password:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was receivedUnderstand this error
+api/users/forgot-password:1  Failed to load resource: the server responded with a status of 404 ()Understand this error ) 
