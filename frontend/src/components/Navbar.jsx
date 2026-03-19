@@ -71,7 +71,7 @@ export default function Navbar() {
                   : <UserCircleIcon style={{ width: 24, height: 24, color: 'var(--gray-600)' }} />
                 }
                 <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--gray-800)' }} className="hidden sm:block">
-                  {user.name.split(' ')[0]}
+                  {(user.name || '').split(' ')[0]}
                 </span>
               </button>
 
@@ -83,7 +83,7 @@ export default function Navbar() {
                   minWidth: 220, overflow: 'hidden', zIndex: 200
                 }}>
                   <div style={{ padding: '16px', borderBottom: '1px solid var(--gray-100)' }}>
-                    <p style={{ fontWeight: 800, fontSize: 15, color: 'var(--dark)' }}>{user.name}</p>
+                    <p style={{ fontWeight: 800, fontSize: 15, color: 'var(--dark)' }}>{user.name || 'User'}</p>
                     <p style={{ fontSize: 12, color: 'var(--gray-600)', marginTop: 2 }}>{user.email}</p>
                   </div>
                   {[
