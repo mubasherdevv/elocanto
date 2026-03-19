@@ -20,14 +20,15 @@ const initTransporter = async () => {
   }
 
   transporter = nodemailer.createTransport({
-    host: smtpHost,
-    port: smtpPort,
-    secure: smtpPort === 465,
-    auth: {
-      user: smtpUser?.trim(),
-      pass: smtpPass?.trim(),
-    },
-  });
+  host: smtpHost,
+  port: smtpPort,
+  secure: smtpPort === 465,
+  family: 4, // 👈 yeh add karo
+  auth: {
+    user: smtpUser?.trim(),
+    pass: smtpPass?.trim(),
+  },
+});
 
   transporter.verify((error, success) => {
     if (error) {
