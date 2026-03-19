@@ -59,6 +59,7 @@ export default function RegisterPage() {
 
   const handleGoogleLogin = useCallback(async (response) => {
     const { credential } = response;
+    if (!credential) return;
     const payload = JSON.parse(atob(credential.split('.')[1]));
     await googleLogin({
       googleId: payload.sub,
