@@ -1,0 +1,86 @@
+Create a complete secure authentication system for a marketplace web application.
+
+Tech stack:
+Frontend: React (Vite), TailwindCSS, Axios
+Backend: Node.js, Express.js
+Database: MongoDB (Mongoose)
+Authentication: JWT
+Password Hashing: bcrypt
+
+Requirements:
+
+1. User Registration (Signup)
+
+* Users can register with name, email, and password
+* Hash password using bcrypt before saving
+* Store user in MongoDB
+* Add fields:
+
+  * isVerified (Boolean, default false)
+  * verificationToken (String)
+  * verificationExpires (Date)
+
+2. Email Verification
+
+* Generate a unique verification token
+* Send verification email with link:
+  /verify-email?token=TOKEN
+* When user clicks link:
+
+  * Verify token
+  * Set isVerified = true
+  * Remove verification token
+* Prevent login if user is not verified
+
+3. Login System
+
+* Allow login only if email is verified
+* Compare password using bcrypt
+* Generate JWT token on successful login
+* Set token expiry (e.g., 1 hour)
+
+4. Security Enhancements
+
+* Implement rate limiting for login attempts
+* Lock account after multiple failed attempts
+* Use helmet for secure HTTP headers
+* Validate and sanitize all inputs
+
+5. Temporary Email Blocking
+
+* Block common temporary email domains (e.g. mailinator.com, 10minutemail.com)
+* Reject signup if email domain is blacklisted
+
+6. Forgot Password
+
+* User enters email to request password reset
+* Generate reset token and expiry (15–30 minutes)
+* Send reset link via email:
+  /reset-password?token=TOKEN
+
+7. Reset Password
+
+* Verify reset token and expiry
+* Allow user to set new password
+* Hash new password before saving
+* Remove reset token after use
+
+
+
+8. Frontend Requirements
+
+* 
+* Email verification success page
+* Forgot password page
+* Reset password page
+* Show proper success/error messages
+
+9. Best Practices
+
+* Use environment variables for secrets
+* Do not expose sensitive data
+* Handle errors properly
+* Use clean folder structure
+
+Goal:
+Build a production-ready, secure authentication system with email verification, password reset, and protection against fake or temporary emails.

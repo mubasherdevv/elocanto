@@ -1,0 +1,122 @@
+Auto Sync Ads Duration (Instant Update Without Manual Renew)
+
+Goal:
+When admin changes Simple or Featured Ads duration in Settings, all ads should instantly update in Ads Management page without manual renewal.
+
+Requirements:
+
+1. Settings Update Trigger
+
+* When admin clicks “Save” in Ads Management Policies:
+
+  * Trigger a backend API: /update-ads-duration
+
+2. Backend Auto Update Logic
+
+* Fetch all ACTIVE ads from database
+* For each ad:
+  IF listingType === "simple":
+  endDate = startDate + simpleAdsDuration
+  IF listingType === "featured":
+  endDate = startDate + featuredAdsDuration
+* Update all ads in database in bulk (no manual renew needed)
+
+3. Instant UI Update (Admin Ads Page)
+
+* After settings update:
+
+  * Automatically refetch ads data OR use global state refresh
+  * Update /admin/ads page instantly
+  * No page reload required
+
+4. Remove Manual Dependency
+
+* 
+* System should auto-manage durations
+
+5. Conditions
+
+* Only update ads where status === "active"
+* Do NOT update expired ads
+
+6. Performance Optimization
+
+* Use bulk update query instead of looping one by one
+* Add indexing on listingType + status
+
+7. UX Improvements
+
+* Show success message:
+  “All ads durations updated successfully”
+* Optional loader while updating
+
+8. Consistency
+
+* Changes should reflect instantly on:
+
+  * Admin Ads Page (/admin/ads)
+  * User Dashboard Ads Cards
+
+Goal:
+Fully automate ads duration updates so admin doesn’t need to manually renew each ad after changing duration settings.
+Auto Sync Ads Duration (Instant Update Without Manual Renew)
+
+Goal:
+When admin changes Simple or Featured Ads duration in Settings, all ads should instantly update in Ads Management page without manual renewal.
+
+Requirements:
+
+1. Settings Update Trigger
+
+* When admin clicks “Save” in Ads Management Policies:
+
+  * Trigger a backend API: /update-ads-duration
+
+2. Backend Auto Update Logic
+
+* Fetch all ACTIVE ads from database
+* For each ad:
+  IF listingType === "simple":
+  endDate = startDate + simpleAdsDuration
+  IF listingType === "featured":
+  endDate = startDate + featuredAdsDuration
+* Update all ads in database in bulk (no manual renew needed)
+
+3. Instant UI Update (Admin Ads Page)
+
+* After settings update:
+
+  * Automatically refetch ads data OR use global state refresh
+  * Update /admin/ads page instantly
+  * No page reload required
+
+4. Remove Manual Dependency
+
+* 
+* System should auto-manage durations
+
+5. Conditions
+
+* Only update ads where status === "active"
+* Do NOT update expired ads
+
+6. Performance Optimization
+
+* Use bulk update query instead of looping one by one
+* Add indexing on listingType + status
+
+7. UX Improvements
+
+* Show success message:
+  “All ads durations updated successfully”
+* Optional loader while updating
+
+8. Consistency
+
+* Changes should reflect instantly on:
+
+  * Admin Ads Page (/admin/ads)
+  * User Dashboard Ads Cards
+
+Goal:
+Fully automate ads duration updates so admin doesn’t need to manually renew each ad after changing duration settings.

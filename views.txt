@@ -1,0 +1,77 @@
+Enhance the Ad Views tracking system with separate logic for Featured Ads and Simple Ads.
+
+Tech stack:
+Frontend: React (Vite), TailwindCSS
+Backend: Node.js, Express.js
+Database: MongoDB
+
+Requirements:
+
+1. Ad Type Handling
+- Each ad has a field: listingType
+  - "featured"
+  - "simple"
+
+2. Featured Ads (Impression-Based Tracking) 
+- Every time the page loads or refreshes: ( http://localhost:5173/ads?listingType=featured ) 
+  - Count a new view for featured ads
+- Do NOT restrict by userId or IP
+- Treat each page load as a valid impression
+- Use this for:
+  - Homepage ( http://localhost:5173/ ) 
+  - Category pages ( http://localhost:5173/ads?listingType=featured&category ) 
+  - Featured ads sections ( http://localhost:5173/ads?listingType=featured )
+
+
+- Store in separate collection: FeaturedAdViews
+  Fields:
+  - adId
+  - viewedAt
+  - page (homepage/category/etc)
+
+3. Simple Ads (Unique View Tracking)
+- Use strict unique tracking:
+  - Logged-in users → userId based
+  - Guests → IP + userAgent + optional localStorage ID
+
+- Only count 1 view per user per ad
+- Prevent duplicate views on refresh
+
+4. Optional Expiry Logic
+- For simple ads:
+  - Allow new view after 24 hours
+
+5. API Logic
+
+- When loading ads list:
+  IF ad.listingType === "featured":
+    → increment view count every time
+
+  IF ad.listingType === "simple":
+    → check if already viewed
+    → if not → increment
+    → if yes → skip
+
+6. Performance Optimization
+- Use bulk insert for featured impressions
+- Index:
+  - adId
+  - userId
+  - ipAddress
+
+7. Dashboard Analytics
+
+- Featured Ads:
+  - Show total impressions (can be high)
+- Simple Ads:
+  - Show unique views only
+
+8. Security
+- Filter bots using user-agent
+- Avoid fake repeated requests
+
+Goal:
+Create a dual tracking system where featured ads count every impression (including refreshes) while simple ads maintain strict unique view counting for accurate analytics.
+
+
+i
