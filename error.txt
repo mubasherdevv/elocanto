@@ -1,13 +1,3 @@
-Uncaught TypeError: Cannot read properties of undefined (reading 'split')
-    at AB (index-DRu0VKwQ.js:16:10905)
-    at B0 (index-DRu0VKwQ.js:8:48577)
-    at iy (index-DRu0VKwQ.js:8:71434)
-    at nS (index-DRu0VKwQ.js:8:81827)
-    at PS (index-DRu0VKwQ.js:8:117668)
-    at HD (index-DRu0VKwQ.js:8:116708)
-    at Oy (index-DRu0VKwQ.js:8:116538)
-    at OS (index-DRu0VKwQ.js:8:113311)
-    at KS (index-DRu0VKwQ.js:8:125191)
-    at MessagePort.L (index-DRu0VKwQ.js:1:11340)
-
-    it show this error in website https://elocanto.up.railway.app/
+Not Found - /users/login ( https://elocanto.up.railway.app/login  ) 
+Not Found - /users/forgot-password  ( https://elocanto.up.railway.app/forgot-password ) 
+Not Found - /users ( https://elocanto.up.railway.app/register ) 
