@@ -39,18 +39,23 @@ const initTransporter = async () => {
     host: resolvedHost,
     port: isGmail ? 587 : smtpPort,
     secure: isGmail ? false : (smtpPort === 465),
-
     auth: {
       user: smtpUser?.trim(),
       pass: smtpPass?.trim(),
     },
     family: 4, // Still force IPv4 just in case
+    connectionTimeout: 20000, // 20 seconds
+    greetingTimeout: 20000,
+    socketTimeout: 30000,
+    debug: true,
+    logger: true,
     tls: {
       rejectUnauthorized: false,
       minVersion: 'TLSv1.2',
       servername: isGmail ? 'smtp.gmail.com' : undefined // Important when host is numeric IP
     }
   };
+
 
   transporter = nodemailer.createTransport(transportConfig);
 
