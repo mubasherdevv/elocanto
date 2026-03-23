@@ -174,10 +174,10 @@ export default function UserProfile() {
 
             {filteredAds.length > 0 ? (
               <div 
-                className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-6 overflow-x-auto sm:overflow-visible pb-8 sm:pb-0 hide-scroll snap-x snap-mandatory"
+                className="flex items-stretch sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-6 overflow-x-auto sm:overflow-visible pb-8 sm:pb-0 hide-scroll snap-x snap-mandatory"
               >
                 {filteredAds.map(ad => (
-                  <div key={ad._id} className="min-w-[280px] sm:min-w-0 snap-center">
+                  <div key={ad._id} className="min-w-[280px] sm:min-w-0 snap-center flex">
                     <AdCard ad={ad} />
                   </div>
                 ))}

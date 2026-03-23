@@ -63,6 +63,8 @@ export default function HomePage() {
           scroll-snap-align: start;
           flex-shrink: 0;
           width: calc(20% - 20px);
+          display: flex;
+          align-items: stretch;
         }
 
         @media (max-width: 1200px) {

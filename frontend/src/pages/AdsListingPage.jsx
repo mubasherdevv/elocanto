@@ -517,6 +517,9 @@ export default function AdsListingPage() {
                   grid-template-columns: repeat(3, 1fr);
                   gap: 20px;
                 }
+                @media (min-width: 1440px) {
+                  .ads-grid { grid-template-columns: repeat(4, 1fr); }
+                }
                 @media (max-width: 1024px) {
                   .ads-grid { grid-template-columns: repeat(2, 1fr); }
                 }
@@ -529,15 +532,26 @@ export default function AdsListingPage() {
                 /* Grid view for featured ads with golden highlight */
                 <div className="ads-grid">
                   {ads.map(ad => (
-                    <Link key={ad._id} to={`/ads/${generateAdSlug(ad)}`} style={{ textDecoration: 'none', background: 'linear-gradient(to bottom, #fffcf0, #ffffff)', border: '2px solid #fde047', borderRadius: 16, overflow: 'hidden', boxShadow: '0 8px 24px rgba(250, 204, 21, 0.15)', display: 'flex', flexDirection: 'column', transition: 'transform 0.2s', position: 'relative' }} className="hover:scale-105">
+                    <Link key={ad._id} to={`/ads/${generateAdSlug(ad)}`} style={{ textDecoration: 'none', background: 'linear-gradient(to bottom, #fffcf0, #ffffff)', border: '2px solid #fde047', borderRadius: 16, overflow: 'hidden', boxShadow: '0 8px 24px rgba(250, 204, 21, 0.15)', display: 'flex', flexDirection: 'column', transition: 'transform 0.2s', position: 'relative', height: '100%' }} className="hover:scale-105">
                       <div style={{ height: 160, position: 'relative' }}>
                         <img src={ad.images[0] ? (ad.images[0].startsWith('http') ? ad.images[0] : `http://localhost:5000${ad.images[0]}`) : 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400'} alt={ad.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         <span style={{ position: 'absolute', top: 12, left: 12, display: 'inline-flex', alignItems: 'center', gap: 4, background: '#facc15', color: '#854d0e', fontSize: 10, fontWeight: 800, padding: '4px 8px', borderRadius: 4, textTransform: 'uppercase', letterSpacing: 0.5 }}>⭐ Featured</span>
                       </div>
                       <div style={{ padding: 16, display: 'flex', flexDirection: 'column', flex: 1 }}>
                         <h3 style={{ fontSize: 14, fontWeight: 800, color: 'var(--dark)', lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', marginBottom: 6 }}>{ad.title}</h3>
-                        <p style={{ fontSize: 18, fontWeight: 900, color: '#854d0e', marginBottom: 12 }}>{settings?.priceFormat || 'PKR'} {ad.price.toLocaleString()}</p>
+                        <p style={{ fontSize: 18, fontWeight: 900, color: '#854d0e', marginBottom: 10 }}>{settings?.priceFormat || 'PKR'} {ad.price.toLocaleString()}</p>
                         
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, color: 'var(--gray-500)', marginBottom: 12 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                            <MapPinIcon style={{ width: 14, height: 14 }} />
+                            <span style={{ fontSize: 11, fontWeight: 700 }}>{ad.city}</span>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                            <EyeIcon style={{ width: 14, height: 14 }} />
+                            <span style={{ fontSize: 11, fontWeight: 700 }}>{ad.views || 0}</span>
+                          </div>
+                        </div>
+
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 12, padding: '8px 0', borderTop: '1px solid #fef08a' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                             <div style={{ width: 18, height: 18, borderRadius: '50%', background: '#854d0e', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontWeight: 900 }}>
@@ -545,20 +559,9 @@ export default function AdsListingPage() {
                             </div>
                             <span style={{ fontSize: 11, fontWeight: 700, color: '#854d0e' }}>{ad.seller?.name || 'Seller'}</span>
                           </div>
-                          {ad.seller?.phone && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#166534', fontSize: 11, fontWeight: 800 }}>
-                              <span style={{ fontSize: 12 }}>📞</span> {ad.seller.phone}
-                            </div>
-                          )}
                         </div>
 
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
-                          <span style={{ color: 'var(--gray-600)', fontSize: 11, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
-                            {ad.city}
-                            <span style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                              <EyeIcon style={{ width: 12, height: 12 }} /> {ad.views || 0}
-                            </span>
-                          </span>
                           <span style={{ background: '#fef08a', color: '#854d0e', padding: '4px 12px', borderRadius: 999, fontSize: 10, fontWeight: 800 }}>View Details</span>
                         </div>
                       </div>

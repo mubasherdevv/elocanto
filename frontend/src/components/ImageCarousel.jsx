@@ -23,7 +23,14 @@ export default function ImageCarousel({ images = [], title = '' }) {
         <img
           src={getUrl(safeImages[currentIndex])}
           alt={`${title} - ${currentIndex + 1}`}
-          style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', display: 'block' }}
+          style={{ 
+            width: '100%', 
+            aspectRatio: '4/3', 
+            objectFit: 'contain', 
+            display: 'block',
+            maxHeight: '480px',
+            background: 'white'
+          }}
           onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600'; }}
         />
         {safeImages.length > 1 && (

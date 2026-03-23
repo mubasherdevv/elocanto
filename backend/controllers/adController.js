@@ -62,8 +62,10 @@ export const getAds = async (req, res) => {
     // Support both listingType and adType
     const adType = req.query.adType || req.query.listingType;
     if (adType) {
-      query.adType = adType;
-      query.listingType = adType;
+      query.$or = [
+        { adType: adType },
+        { listingType: adType }
+      ];
     }
 
     // Sorting

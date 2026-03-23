@@ -52,15 +52,15 @@ export default function AdCard({ ad, initialFav = false, onFavToggle }) {
   return (
     <Link 
       to={`/ads/${generateAdSlug(ad)}`} 
-      className="block group bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 overflow-hidden"
+      className="flex flex-col h-full group bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 overflow-hidden"
       style={{ textDecoration: 'none' }}
     >
       {/* Square Image Container */}
-      <div className="relative aspect-square bg-gray-50 flex items-center justify-center overflow-hidden">
+      <div className="relative aspect-square bg-white flex items-center justify-center overflow-hidden flex-shrink-0">
         <img
           src={image}
           alt={ad.title}
-          className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110"
+          className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110 p-4"
           onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400'; }}
         />
         
@@ -84,7 +84,7 @@ export default function AdCard({ ad, initialFav = false, onFavToggle }) {
       </div>
 
       {/* Body Content */}
-      <div className="p-4">
+      <div className="p-4 flex flex-col flex-1">
         <div className="mb-2">
           <p className="text-xl font-black text-gray-900 leading-tight">
             {formatPrice(ad.price)}
@@ -96,24 +96,32 @@ export default function AdCard({ ad, initialFav = false, onFavToggle }) {
           )}
         </div>
 
-        <h3 className="text-gray-500 text-sm font-medium leading-relaxed line-clamp-2 mb-4 h-10">
+        <h3 className="text-gray-500 text-sm font-medium leading-relaxed line-clamp-2 mb-2 h-10">
           {ad.title}
         </h3>
+
+        <div className="flex items-center gap-3 text-gray-400 mb-4">
+          <div className="flex items-center gap-1 min-w-0">
+            <MapPinIcon className="w-3.5 h-3.5 flex-shrink-0" />
+            <span className="text-[10px] font-bold truncate">{ad.city}</span>
+          </div>
+          <div className="flex items-center gap-1 flex-shrink-0">
+            <EyeIcon className="w-3.5 h-3.5" />
+            <span className="text-[10px] font-bold">{ad.views || 0}</span>
+          </div>
+        </div>
 
         <div className="flex items-center justify-between pt-3 border-t border-gray-50 mt-auto">
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 rounded-full bg-orange-500 text-white flex items-center justify-center text-[10px] font-black flex-shrink-0">
               {ad.seller?.name?.charAt(0).toUpperCase() || 'U'}
             </div>
-            <span className="text-xs font-bold text-gray-400 truncate max-w-[80px]">
+            <span className="text-xs font-bold text-gray-400 truncate max-w-[120px]">
               {ad.seller?.name || 'Seller'}
             </span>
           </div>
           
-          <div className="flex items-center gap-2 text-gray-400">
-            <MapPinIcon className="w-3.5 h-3.5" />
-            <span className="text-[11px] font-bold truncate max-w-[60px]">{ad.city}</span>
-          </div>
+          <button className="text-[10px] font-black text-orange-500 uppercase tracking-tight">View Details</button>
         </div>
       </div>
     </Link>
