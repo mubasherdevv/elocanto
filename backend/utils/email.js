@@ -12,7 +12,7 @@ const initTransporter = async () => {
   const smtpUser = emailSettings.smtpUser || process.env.EMAIL_USER;
   const smtpPass = emailSettings.smtpPass || process.env.EMAIL_PASS;
   const smtpHost = emailSettings.smtpHost || 'smtp.gmail.com';
-  const smtpPort = emailSettings.smtpPort || 587;
+  const smtpPort = emailSettings.smtpPort || 465;
 
   if (!smtpUser || !smtpPass) {
     console.error('Email credentials not configured');
