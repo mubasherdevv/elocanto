@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../lib/api';
 import { CheckCircleIcon, XCircleIcon, ShoppingBagIcon } from '@heroicons/react/24/outline';
 
 export default function OrderHistoryPage() {
@@ -13,7 +13,7 @@ export default function OrderHistoryPage() {
   useEffect(() => {
     const fetchMyOrders = async () => {
       try {
-        const { data } = await axios.get('/api/orders/myorders');
+        const { data } = await api.get('/orders/myorders');
         setOrders(data);
       } catch (err) {
         setError(err.response?.data?.message || err.message);

@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
 
 const AdContext = createContext();
 
@@ -17,7 +17,7 @@ export const AdProvider = ({ children }) => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const { data } = await axios.get('/api/settings');
+        const { data } = await api.get('/settings');
         setSettings(data);
       } catch (err) {
         console.error('Failed to fetch settings:', err);
@@ -31,7 +31,7 @@ export const AdProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       const pageSize = params.pageSize || settings?.featuredAdsPerPage || 12;
-      const { data } = await axios.get('/api/ads', { params: { ...params, pageSize } });
+      const { data } = await api.get('/ads', { params: { ...params, pageSize } });
       setAds(data.ads);
       setTotalPages(data.pages);
       setTotalCount(data.total);
@@ -45,7 +45,7 @@ export const AdProvider = ({ children }) => {
 
   const fetchFeaturedAds = useCallback(async () => {
     try {
-      const { data } = await axios.get('/api/ads/featured');
+      const { data } = await api.get('/ads/featured');
       setFeaturedAds(data);
     } catch (err) {
       console.error(err);
@@ -54,7 +54,7 @@ export const AdProvider = ({ children }) => {
 
   const fetchLatestAds = useCallback(async () => {
     try {
-      const { data } = await axios.get('/api/ads/latest');
+      const { data } = await api.get('/ads/latest');
       setLatestAds(data);
     } catch (err) {
       console.error(err);

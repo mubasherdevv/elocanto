@@ -369,6 +369,7 @@ export const getSellerAds = async (req, res) => {
       isApproved: true,
       expiresAt: { $gt: new Date() }
     })
+      .populate('seller', 'name profilePhoto city phone badges createdAt')
       .populate('category', 'name slug icon')
       .sort({ createdAt: -1 });
     res.json(ads);

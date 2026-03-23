@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
 import {
   BarChart,
   Bar,
@@ -23,7 +23,7 @@ const AdminAnalytics = () => {
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const { data: analyticsData } = await axios.get('/api/orders/analytics');
+        const { data: analyticsData } = await api.get('/orders/analytics');
         setData(analyticsData);
       } catch (err) {
         setError(err.response?.data?.message || err.message);

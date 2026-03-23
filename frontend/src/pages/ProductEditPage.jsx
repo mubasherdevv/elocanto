@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 
@@ -24,7 +24,7 @@ export default function ProductEditPage() {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const { data } = await axios.get(`/api/products/${id}`);
+        const { data } = await api.get(`/products/${id}`);
         setName(data.name);
         setPrice(data.price);
         setImage(data.image);
@@ -46,10 +46,9 @@ export default function ProductEditPage() {
     e.preventDefault();
     try {
       setUpdateLoading(true);
-      await axios.put(
-        `/api/products/${id}`,
-        { name, price, image, brand, category, countInStock, description },
-        { headers: { Authorization: `Bearer ${token}` } }
+      await api.put(
+        `/products/${id}`,
+        { name, price, image, brand, category, countInStock, description }
       );
       navigate('/admin');
     } catch (err) {

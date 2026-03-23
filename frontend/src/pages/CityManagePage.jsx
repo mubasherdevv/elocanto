@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
 import {
   PlusIcon,
   PencilSquareIcon,
@@ -36,7 +36,7 @@ export default function CityManagePage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get('/api/cities');
+      const { data } = await api.get('/cities');
       setCities(data);
     } catch (err) {
       console.error('Error fetching cities:', err);
@@ -63,13 +63,11 @@ export default function CityManagePage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      
       if (editingItem) {
-        await axios.put(`/api/cities/${editingItem._id}`, formData, config);
+        await api.put(`/cities/${editingItem._id}`, formData);
         setMessage('City updated!');
       } else {
-        await axios.post('/api/cities', formData, config);
+        await api.post('/cities', formData);
         setMessage('City created!');
       }
 
@@ -85,8 +83,7 @@ export default function CityManagePage() {
   const handleDelete = async (id) => {
     if (window.confirm('Delete this city? This action cannot be undone.')) {
       try {
-        const config = { headers: { Authorization: `Bearer ${token}` } };
-        await axios.delete(`/api/cities/${id}`, config);
+        await api.delete(`/cities/${id}`);
         fetchData();
       } catch (err) {
         alert(err.response?.data?.message || 'Delete failed.');

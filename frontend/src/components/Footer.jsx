@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../lib/api';
 import { useSettings } from '../context/SettingsContext';
 
 export default function Footer() {
@@ -13,8 +13,8 @@ export default function Footer() {
     const loadFooterData = async () => {
       try {
         const [catRes, cityRes] = await Promise.all([
-          axios.get('/api/categories'),
-          axios.get('/api/cities')
+          api.get('/categories'),
+          api.get('/cities')
         ]);
         setCategories(catRes.data.slice(0, 6)); // Limit 6 in footer 
         setCities(cityRes.data.slice(0, 6)); // Limit 6 in footer

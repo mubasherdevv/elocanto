@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { useAds } from '../context/AdContext';
 import AdCard from '../components/AdCard';
-import axios from 'axios';
+import api from '../lib/api';
 import { FunnelIcon, ArrowsUpDownIcon, XMarkIcon, ShieldCheckIcon, AdjustmentsHorizontalIcon, ChevronDownIcon, EyeIcon } from '@heroicons/react/24/outline';
 import { generateAdSlug } from '../utils/urlUtils';
 
@@ -91,7 +91,7 @@ export default function AdsListingPage() {
     const fetchWithRetry = async (url, maxRetries = 3) => {
       for (let i = 0; i < maxRetries; i++) {
         try {
-          const res = await axios.get(url);
+          const res = await api.get(url.startsWith('/api') ? url.substring(4) : url);
           return res;
         } catch (err) {
           if (err.response?.status === 429 && i < maxRetries - 1) {
@@ -106,10 +106,10 @@ export default function AdsListingPage() {
       try {
         const galleryLimit = settings?.featuredAdsLimit || 10;
         const [catRes, subRes, cityRes, galleryRes] = await Promise.all([
-          fetchWithRetry('/api/categories'),
-          fetchWithRetry('/api/subcategories'),
-          fetchWithRetry('/api/cities'),
-          fetchWithRetry(`/api/ads/featured?limit=${galleryLimit}`).catch(() => null),
+          api.get('/categories'),
+          api.get('/subcategories'),
+          api.get('/cities'),
+          api.get(`/ads/featured?limit=${galleryLimit}`).catch(() => null),
         ]);
         
         if (catRes) setCategories(catRes.data);
@@ -133,7 +133,7 @@ export default function AdsListingPage() {
       if (!localStorage.getItem('ad_viewer_id')) {
         localStorage.setItem('ad_viewer_id', viewerId);
       }
-      axios.post('/api/views/track-bulk', { adIds, localStorageId: viewerId }).catch(console.error);
+      api.post('/views/track-bulk', { adIds, localStorageId: viewerId }).catch(console.error);
     }
   }, [ads, location.search]);
 
@@ -184,18 +184,19 @@ export default function AdsListingPage() {
       </div>
 
       {/* Top Controls Bar */}
-      <div className="container-custom" style={{ marginBottom: 32 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--gray-200)', paddingBottom: 16, flexWrap: 'nowrap', overflowX: 'auto', gap: 16 }} className="hide-scroll">
-          <div style={{ display: 'flex', gap: 24, fontSize: 13, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.5, flexShrink: 0 }}>
+      <div className="container-custom" style={{ marginBottom: 24 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {/* Ad Type Toggle - Keep for both but style slightly better */}
+          <div style={{ display: 'flex', gap: 12, borderBottom: '1px solid #eef2ff', paddingBottom: 12, overflowX: 'auto' }} className="hide-scroll">
             <button
               onClick={() => updateFilter('listingType', 'featured')}
               style={{ 
-                color: listingType === 'featured' ? 'var(--primary)' : 'var(--gray-400)', 
-                background: listingType === 'featured' ? 'rgba(62, 111, 225, 0.1)' : 'none',
-                display: 'flex', alignItems: 'center', gap: 8, 
-                padding: '8px 16px', borderRadius: 12,
-                border: listingType === 'featured' ? '2px solid var(--primary)' : '2px solid transparent',
-                cursor: 'pointer', transition: 'all 0.2s', whiteSpace: 'nowrap', fontWeight: 800
+                color: listingType === 'featured' ? 'white' : '#64748b', 
+                background: listingType === 'featured' ? 'var(--primary)' : 'white',
+                padding: '10px 20px', borderRadius: 12,
+                border: '1px solid ' + (listingType === 'featured' ? 'var(--primary)' : '#e2e8f0'),
+                cursor: 'pointer', transition: 'all 0.2s', whiteSpace: 'nowrap', fontWeight: 800, fontSize: 12,
+                boxShadow: listingType === 'featured' ? '0 10px 20px rgba(249, 94, 38, 0.2)' : 'none'
               }}
             >
               ⭐ FEATURED ADS
@@ -203,64 +204,79 @@ export default function AdsListingPage() {
             <button
               onClick={() => updateFilter('listingType', 'simple')}
               style={{ 
-                color: listingType === 'simple' ? 'var(--primary)' : 'var(--gray-400)', 
-                background: listingType === 'simple' ? 'rgba(62, 111, 225, 0.1)' : 'none',
-                display: 'flex', alignItems: 'center', gap: 8, 
-                padding: '8px 16px', borderRadius: 12,
-                border: listingType === 'simple' ? '2px solid var(--primary)' : '2px solid transparent',
-                cursor: 'pointer', transition: 'all 0.2s', whiteSpace: 'nowrap', fontWeight: 800
+                color: listingType === 'simple' ? 'white' : '#64748b', 
+                background: listingType === 'simple' ? 'var(--primary)' : 'white',
+                padding: '10px 20px', borderRadius: 12,
+                border: '1px solid ' + (listingType === 'simple' ? 'var(--primary)' : '#e2e8f0'),
+                cursor: 'pointer', transition: 'all 0.2s', whiteSpace: 'nowrap', fontWeight: 800, fontSize: 12,
+                boxShadow: listingType === 'simple' ? '0 10px 20px rgba(249, 94, 38, 0.2)' : 'none'
               }}
             >
-              <AdjustmentsHorizontalIcon style={{ width: 16 }} /> SIMPLE ADS
+              📋 SIMPLE ADS
             </button>
           </div>
-          
-          <div style={{ display: 'flex', gap: 12, flexShrink: 0 }}>
-            <button className="btn-ghost sm:hidden" style={{ border: '1px solid var(--gray-200)', background: 'white' }} onClick={() => setShowFilters(true)}>
-              <FunnelIcon style={{ width: 16 }} /> Filters
-            </button>
-            <button style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'white', border: '1px solid var(--gray-200)', padding: '8px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600, color: 'var(--gray-800)', cursor: 'pointer' }} onClick={() => setShowFilters(true)}>
-              <AdjustmentsHorizontalIcon style={{ width: 16 }} /> Advanced Filters
-            </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'white', border: '1px solid var(--gray-200)', padding: '0 12px', borderRadius: 8 }}>
-              <select 
-                value={sort} onChange={(e) => updateFilter('sort', e.target.value)}
-                style={{ border: 'none', background: 'transparent', fontSize: 13, fontWeight: 600, color: 'var(--gray-800)', height: 36, outline: 'none', cursor: 'pointer' }}
+
+          {/* Quick Filter Actions - ONLY on small devices */}
+          {!isLarge && (
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+              <button 
+                style={{ 
+                  flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, 
+                  background: 'white', border: '1px solid #e2e8f0', padding: '12px 16px', 
+                  borderRadius: 12, fontSize: 14, fontWeight: 700, color: '#1e293b', 
+                  cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' 
+                }} 
+                onClick={() => setShowFilters(true)}
               >
-                <option value="">Newest First</option>
-                <option value="price_asc">Price: Low to High</option>
-                <option value="price_desc">Price: High to Low</option>
-                <option value="oldest">Oldest First</option>
-              </select>
+                <AdjustmentsHorizontalIcon style={{ width: 18, color: '#64748b' }} /> 
+                Advanced Filters
+              </button>
+              
+              <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <select 
+                  value={sort} onChange={(e) => updateFilter('sort', e.target.value)}
+                  style={{ 
+                    width: '100%', appearance: 'none', background: 'white', border: '1px solid #e2e8f0', 
+                    padding: '12px 16px', paddingRight: 40, borderRadius: 12, fontSize: 14, 
+                    fontWeight: 700, color: '#1e293b', cursor: 'pointer', outline: 'none',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+                  }}
+                >
+                  <option value="">Newest First</option>
+                  <option value="price_asc">Price: Low to High</option>
+                  <option value="price_desc">Price: High to Low</option>
+                  <option value="oldest">Oldest First</option>
+                </select>
+                <ChevronDownIcon style={{ width: 16, color: '#64748b', position: 'absolute', right: 16, pointerEvents: 'none' }} />
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
       {/* Gallery Ads Section */}
-              {featuredAds.length > 0 && !category && !keyword && (
+      {featuredAds.length > 0 && !category && !keyword && (
         <div className="container-custom" style={{ marginBottom: 40 }}>
-          <div style={{ background: '#fdf8e3', padding: 'clamp(20px, 4vw, 32px)', borderRadius: 24, border: '1px solid #fde047' }}>
+          <div style={{ background: '#fdf8e3', padding: 'clamp(20px, 4vw, 32px)', borderRadius: 24, border: '1px solid #fde047', boxShadow: '0 10px 30px rgba(250, 204, 21, 0.1)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 24 }}>
               <div>
-                <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--dark)' }}>Gallery Ads</h3>
-                <p style={{ fontSize: 11, color: 'var(--gray-600)', letterSpacing: 1, textTransform: 'uppercase', fontWeight: 700, marginTop: 4 }}>FEATURED TOP PICKS OF THE MONTH</p>
+                <h3 style={{ fontSize: 18, fontWeight: 900, color: '#854d0e' }}>Gallery Ads</h3>
+                <p style={{ fontSize: 10, color: '#a16207', letterSpacing: 1, textTransform: 'uppercase', fontWeight: 800, marginTop: 4 }}>TOP PICKS • VERIFIED LISTINGS</p>
               </div>
-              <Link to="/ads?sort=featured" style={{ color: 'var(--primary)', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>View All Listings &rarr;</Link>
+              <Link to="/ads?sort=featured" style={{ background: '#fef9c3', color: '#854d0e', fontSize: 12, fontWeight: 800, textDecoration: 'none', padding: '8px 16px', borderRadius: 12, border: '1px solid #fef08a' }}>View All &rarr;</Link>
             </div>
             
-            <style>{`.hide-scroll::-webkit-scrollbar { display: none; }`}</style>
-            <div className="hide-scroll" style={{ 
-              display: 'flex', gap: 24, overflowX: 'auto', paddingBottom: 24, paddingTop: 8,
+            <div className="hide-scroll no-scrollbar" style={{ 
+              display: 'flex', gap: 20, overflowX: 'auto', paddingBottom: 16, paddingTop: 4,
               scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', msOverflowStyle: 'none'
             }}>
               {featuredAds.slice(0, settings?.featuredAdsLimit || 10).map(ad => (
-                <Link key={ad._id} to={`/ads/${generateAdSlug(ad)}`} style={{ textDecoration: 'none', textAlign: 'center', flexShrink: 0, width: 120, scrollSnapAlign: 'start' }}>
-                  <div style={{ width: 120, height: 120, borderRadius: '50%', background: 'white', border: '3px solid white', boxShadow: '0 8px 16px rgba(0,0,0,0.06)', marginBottom: 12, overflow: 'hidden', transition: 'transform 0.2s' }} className="hover:scale-105">
-                    <img src={ad.images[0] ? (ad.images[0].startsWith('http') ? ad.images[0] : `http://localhost:5000${ad.images[0]}`) : 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400'} alt={ad.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <Link key={ad._id} to={`/ads/${generateAdSlug(ad)}`} style={{ textDecoration: 'none', textAlign: 'center', flexShrink: 0, width: 130, scrollSnapAlign: 'start' }}>
+                  <div style={{ width: 130, height: 130, borderRadius: '50%', background: 'white', border: '4px solid white', boxShadow: '0 10px 20px rgba(0,0,0,0.06)', marginBottom: 12, overflow: 'hidden', transition: 'all 0.3s' }} className="hover:scale-105 hover:shadow-lg group">
+                    <img src={ad.images[0] ? (ad.images[0].startsWith('http') ? ad.images[0] : `http://localhost:5000${ad.images[0]}`) : 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400'} alt={ad.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} className="transition-transform group-hover:scale-110" />
                   </div>
-                  <div style={{ color: 'var(--primary)', fontSize: 14, fontWeight: 900, marginBottom: 4 }}>{settings?.priceFormat || 'PKR'} {ad.price.toLocaleString()}</div>
-                  <div style={{ color: 'var(--dark)', fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{ad.title}</div>
+                  <div style={{ color: '#854d0e', fontSize: 15, fontWeight: 900, marginBottom: 2 }}>{settings?.priceFormat || 'PKR'} {ad.price.toLocaleString()}</div>
+                  <div style={{ color: '#a16207', fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: '0 4px' }}>{ad.title}</div>
                 </Link>
               ))}
             </div>
@@ -278,41 +294,43 @@ export default function AdsListingPage() {
             <button onClick={() => setShowFilters(false)} className="btn-ghost" style={{ padding: 4 }}><XMarkIcon style={{ width: 24, height: 24 }} /></button>
           </div>
 
-          <div style={{ background: 'white', padding: 24, borderRadius: 16, border: '1px solid var(--gray-200)', marginBottom: 24 }}>
-            <h4 style={{ fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, color: 'var(--dark)', marginBottom: 20 }}>Filter by Price</h4>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, fontWeight: 700, color: 'var(--gray-600)', marginBottom: 12 }}>
-              <span>Min Price</span>
-              <span>Max Price</span>
+          {!isLarge && (
+            <div style={{ background: 'white', padding: 24, borderRadius: 16, border: '1px solid var(--gray-200)', marginBottom: 24 }}>
+              <h4 style={{ fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, color: 'var(--dark)', marginBottom: 20 }}>Filter by Price</h4>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, fontWeight: 700, color: 'var(--gray-600)', marginBottom: 12 }}>
+                <span>Min Price</span>
+                <span>Max Price</span>
+              </div>
+              {/* Simple slider visual representation (fake slider for styling) */}
+              <div style={{ height: 4, background: 'var(--gray-200)', borderRadius: 2, position: 'relative', marginBottom: 20 }}>
+                <div style={{ position: 'absolute', left: '20%', right: '40%', height: '100%', background: 'var(--primary)', borderRadius: 2 }}></div>
+                <div style={{ position: 'absolute', left: '20%', top: '50%', transform: 'translate(-50%, -50%)', width: 14, height: 14, background: 'var(--primary)', borderRadius: '50%', border: '2px solid white', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}></div>
+                <div style={{ position: 'absolute', right: '40%', top: '50%', transform: 'translate(50%, -50%)', width: 14, height: 14, background: 'var(--primary)', borderRadius: '50%', border: '2px solid white', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}></div>
+              </div>
+              <div style={{ display: 'flex', gap: 12 }}>
+                <input 
+                  type="number" 
+                  placeholder="Min" 
+                  className="input-field" 
+                  style={{ padding: '10px 14px', fontSize: 13, borderRadius: 12, border: '2px solid var(--gray-200)' }} 
+                  value={tempFilters.priceMin} 
+                  onChange={(e) => setTempFilters({...tempFilters, priceMin: e.target.value})}
+                  onBlur={(e) => applyFiltersToUrl({...tempFilters, priceMin: e.target.value})}
+                  onKeyDown={(e) => e.key === 'Enter' && applyFiltersToUrl({...tempFilters, priceMin: e.target.value})}
+                />
+                <input 
+                  type="number" 
+                  placeholder="Max" 
+                  className="input-field" 
+                  style={{ padding: '10px 14px', fontSize: 13, borderRadius: 12, border: '2px solid var(--gray-200)' }} 
+                  value={tempFilters.priceMax} 
+                  onChange={(e) => setTempFilters({...tempFilters, priceMax: e.target.value})}
+                  onBlur={(e) => applyFiltersToUrl({...tempFilters, priceMax: e.target.value})}
+                  onKeyDown={(e) => e.key === 'Enter' && applyFiltersToUrl({...tempFilters, priceMax: e.target.value})}
+                />
+              </div>
             </div>
-            {/* Simple slider visual representation (fake slider for styling) */}
-            <div style={{ height: 4, background: 'var(--gray-200)', borderRadius: 2, position: 'relative', marginBottom: 20 }}>
-              <div style={{ position: 'absolute', left: '20%', right: '40%', height: '100%', background: 'var(--primary)', borderRadius: 2 }}></div>
-              <div style={{ position: 'absolute', left: '20%', top: '50%', transform: 'translate(-50%, -50%)', width: 14, height: 14, background: 'var(--primary)', borderRadius: '50%', border: '2px solid white', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}></div>
-              <div style={{ position: 'absolute', right: '40%', top: '50%', transform: 'translate(50%, -50%)', width: 14, height: 14, background: 'var(--primary)', borderRadius: '50%', border: '2px solid white', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}></div>
-            </div>
-            <div style={{ display: 'flex', gap: 12 }}>
-              <input 
-                type="number" 
-                placeholder="Min" 
-                className="input-field" 
-                style={{ padding: '10px 14px', fontSize: 13, borderRadius: 12, border: '2px solid var(--gray-200)' }} 
-                value={tempFilters.priceMin} 
-                onChange={(e) => setTempFilters({...tempFilters, priceMin: e.target.value})}
-                onBlur={(e) => applyFiltersToUrl({...tempFilters, priceMin: e.target.value})}
-                onKeyDown={(e) => e.key === 'Enter' && applyFiltersToUrl({...tempFilters, priceMin: e.target.value})}
-              />
-              <input 
-                type="number" 
-                placeholder="Max" 
-                className="input-field" 
-                style={{ padding: '10px 14px', fontSize: 13, borderRadius: 12, border: '2px solid var(--gray-200)' }} 
-                value={tempFilters.priceMax} 
-                onChange={(e) => setTempFilters({...tempFilters, priceMax: e.target.value})}
-                onBlur={(e) => applyFiltersToUrl({...tempFilters, priceMax: e.target.value})}
-                onKeyDown={(e) => e.key === 'Enter' && applyFiltersToUrl({...tempFilters, priceMax: e.target.value})}
-              />
-            </div>
-          </div>
+          )}
 
           <div style={{ background: 'white', padding: 24, borderRadius: 16, border: '1px solid var(--gray-200)' }}>
             <h4 style={{ fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, color: 'var(--dark)', marginBottom: 20 }}>Categories</h4>
@@ -503,7 +521,7 @@ export default function AdsListingPage() {
                   .ads-grid { grid-template-columns: repeat(2, 1fr); }
                 }
                 @media (max-width: 640px) {
-                  .ads-grid { grid-template-columns: repeat(1, 1fr); }
+                  .ads-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
                 }
               `}</style>
 

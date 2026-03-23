@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
 import { 
   CloudArrowUpIcon, 
   CheckCircleIcon,
@@ -48,8 +48,7 @@ export default function AdminSettingsPage() {
       setLoading(true);
       setError(null);
       if (!token) return;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const { data } = await axios.get('/api/admin/settings', config);
+      const { data } = await api.get('/admin/settings');
       setSettings(data);
     } catch (err) {
       console.error('Error fetching settings:', err);
@@ -70,8 +69,7 @@ export default function AdminSettingsPage() {
     else setUploadingFavicon(true);
 
     try {
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const { data } = await axios.post('/api/upload', formData, config);
+      const { data } = await api.post('/upload', formData);
       const url = data.urls[0];
       setSettings({ ...settings, [type]: url });
     } catch (err) {
@@ -91,11 +89,10 @@ export default function AdminSettingsPage() {
         alert('Session expired. Please login again.');
         return;
       }
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.put('/api/admin/settings', settings, config);
+      await api.put('/admin/settings', settings);
 
       if (activeTab === 'ads') {
-        await axios.post('/api/admin/update-ads-duration', {}, config);
+        await api.post('/admin/update-ads-duration', {});
         setMessage('Settings updated & all ads durations auto-synced!');
       } else {
         setMessage('Settings updated successfully!');

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { XCircleIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 
@@ -12,9 +12,7 @@ const RecentOrdersList = () => {
   useEffect(() => {
     const fetchRecentOrders = async () => {
       try {
-        const { data } = await axios.get('/api/orders/recent', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const { data } = await api.get('/orders/recent');
         setOrders(data);
       } catch (err) {
         setError(err.response?.data?.message || err.message);

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { MagnifyingGlassIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { useAds } from '../context/AdContext';
 import AdCard from '../components/AdCard';
-import axios from 'axios';
+import api from '../lib/api';
 
 export default function HomePage() {
   const { featuredAds, latestAds, fetchFeaturedAds, fetchLatestAds, loading } = useAds();
@@ -17,8 +17,8 @@ export default function HomePage() {
     const loadData = async () => {
       try {
         const [catRes, cityRes] = await Promise.all([
-          axios.get('/api/categories'),
-          axios.get('/api/cities')
+          api.get('/categories'),
+          api.get('/cities')
         ]);
         setCategories(catRes.data);
         setCities(cityRes.data);
@@ -39,7 +39,7 @@ export default function HomePage() {
       if (!localStorage.getItem('ad_viewer_id')) {
         localStorage.setItem('ad_viewer_id', viewerId);
       }
-      axios.post('/api/views/track-bulk', { adIds, localStorageId: viewerId, page: 'homepage' }).catch(console.error);
+      api.post('/views/track-bulk', { adIds, localStorageId: viewerId, page: 'homepage' }).catch(console.error);
     }
   }, [featuredAds]);
 

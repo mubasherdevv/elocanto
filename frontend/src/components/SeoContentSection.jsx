@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import axios from 'axios';
+import api from '../lib/api';
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
@@ -33,7 +33,7 @@ export default function SeoContentSection() {
       }
 
       try {
-        const { data } = await axios.get(`${API_URL}/api/seo/match`, { params: { pageType, slug } });
+        const { data } = await api.get('/seo/match', { params: { pageType, slug } });
         setContent(data);
       } catch (err) {
         console.error('SEO Content load error:', err);

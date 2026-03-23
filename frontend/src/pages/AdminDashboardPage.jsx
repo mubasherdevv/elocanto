@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
 import { 
   UsersIcon, 
   TagIcon, 
@@ -42,8 +42,7 @@ export default function AdminDashboardPage() {
           setLoading(false);
           return;
         }
-        const config = { headers: { Authorization: `Bearer ${token}` } };
-        const { data } = await axios.get('/api/admin/analytics', config);
+        const { data } = await api.get('/admin/analytics');
         setData(data);
       } catch (err) {
         console.error('Error fetching analytics:', err);

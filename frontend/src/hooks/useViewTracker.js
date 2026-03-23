@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
 
 const VIEWER_ID_KEY = 'ad_viewer_id';
 
@@ -19,7 +19,7 @@ export const useViewTracker = () => {
     if (!adId) return;
 
     try {
-      await axios.post('/api/views/track', {
+      await api.post('/views/track', {
         adId,
         page,
         localStorageId: viewerId
@@ -33,7 +33,7 @@ export const useViewTracker = () => {
     if (!adIds || adIds.length === 0) return;
 
     try {
-      await axios.post('/api/views/track-bulk', {
+      await api.post('/views/track-bulk', {
         adIds,
         localStorageId: viewerId
       });

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
 import {
   MagnifyingGlassIcon,
   TrashIcon,
@@ -63,7 +63,7 @@ export default function AdminAdsPage() {
 
   const fetchSettings = async () => {
     try {
-      const { data } = await axios.get('/api/settings');
+      const { data } = await api.get('/settings');
       setSettings(data);
     } catch (err) {
       console.error('Error fetching settings:', err);
@@ -75,12 +75,11 @@ export default function AdminAdsPage() {
       setLoading(true);
       setError(null);
       if (!token) return;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-
       const [adsRes, catRes] = await Promise.all([
-        axios.get('/api/ads/admin/all', config),
-        axios.get('/api/categories', config)
+        api.get('/ads/admin/all'),
+        api.get('/categories')
       ]);
+
 
       setAds(Array.isArray(adsRes.data) ? adsRes.data : (adsRes.data.ads || []));
       setCategories(catRes.data);
@@ -95,9 +94,8 @@ export default function AdminAdsPage() {
   const deleteAd = async (id) => {
     if (window.confirm('Are you sure you want to delete this advertisement?')) {
       try {
-        if (!token) return;
-        const config = { headers: { Authorization: `Bearer ${token}` } };
-        await axios.delete(`/api/ads/${id}`, config);
+        await api.delete(`/ads/${id}`);
+
         fetchData();
       } catch (err) {
         console.error('Error deleting ad:', err);
@@ -109,12 +107,11 @@ export default function AdminAdsPage() {
   const renewAd = async (ad) => {
     if (!window.confirm('Renew this ad for the default duration?')) return;
     try {
-      if (!token) return;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
       const duration = ad.isFeatured ? (settings?.featuredAdsDuration || 7) : (settings?.simpleAdsDuration || 30);
       const newExpiresAt = new Date();
       newExpiresAt.setDate(newExpiresAt.getDate() + duration);
-      await axios.put(`/api/ads/${ad._id}`, { expiresAt: newExpiresAt, isActive: true }, config);
+      await api.put(`/ads/${ad._id}`, { expiresAt: newExpiresAt, isActive: true });
+
       alert(`Ad renewed for ${duration} days!`);
       fetchData();
     } catch (err) {
@@ -127,9 +124,6 @@ export default function AdminAdsPage() {
     e.preventDefault();
     try {
       setUpdateLoading(true);
-      if (!token) return;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-
       const updateData = {
         title: editingAd.title,
         price: editingAd.price,
@@ -141,8 +135,9 @@ export default function AdminAdsPage() {
         isApproved: editingAd.isApproved,
         expiresAt: editingAd.expiresAt
       };
+      await api.put(`/ads/${editingAd._id}`, updateData);
 
-      await axios.put(`/api/ads/${editingAd._id}`, updateData, config);
+
       setView('list');
       setEditingAd(null);
       fetchData();
@@ -156,9 +151,8 @@ export default function AdminAdsPage() {
 
   const toggleFeatured = async (id, currentStatus) => {
     try {
-      if (!token) return;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.put(`/api/ads/${id}`, { isFeatured: !currentStatus }, config);
+      await api.put(`/ads/${id}`, { isFeatured: !currentStatus });
+
       fetchData();
     } catch (err) {
       console.error('Error toggling featured status:', err);
@@ -398,8 +392,8 @@ export default function AdminAdsPage() {
                             <button
                               onClick={async () => {
                                 try {
-                                  const config = { headers: { Authorization: `Bearer ${token}` } };
-                                  await axios.put(`/api/ads/${ad._id}`, { isApproved: true }, config);
+                                  await api.put(`/ads/${ad._id}`, { isApproved: true });
+
                                   fetchData();
                                 } catch (err) { alert('Failed to approve'); }
                               }}
@@ -414,8 +408,8 @@ export default function AdminAdsPage() {
                               onClick={async () => {
                                 try {
                                   if (!window.confirm('Reject and hide this ad?')) return;
-                                  const config = { headers: { Authorization: `Bearer ${token}` } };
-                                  await axios.put(`/api/ads/${ad._id}`, { isApproved: false, isActive: false }, config);
+                                  await api.put(`/ads/${ad._id}`, { isApproved: false, isActive: false });
+
                                   fetchData();
                                 } catch (err) { alert('Failed to reject'); }
                               }}

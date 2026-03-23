@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { PlusIcon, PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
-import axios from 'axios';
+import api from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 
 export default function AdminProductListPage() {
@@ -19,7 +19,7 @@ export default function AdminProductListPage() {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get('/api/products');
+      const { data } = await api.get('/products');
       setProducts(data);
       setError('');
     } catch (err) {
@@ -32,9 +32,7 @@ export default function AdminProductListPage() {
   const deleteHandler = async (id) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
-        await axios.delete(`/api/products/${id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        await api.delete(`/products/${id}`);
         fetchProducts();
       } catch (err) {
         alert(err.response?.data?.message || err.message);
@@ -45,9 +43,7 @@ export default function AdminProductListPage() {
   const createProductHandler = async () => {
     if (window.confirm('Are you sure you want to create a new product?')) {
       try {
-        const { data } = await axios.post('/api/products', {}, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const { data } = await api.post('/products', {});
         navigate(`/admin/product/${data._id}/edit`);
       } catch (err) {
         alert(err.response?.data?.message || err.message);

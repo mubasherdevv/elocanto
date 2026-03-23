@@ -6,7 +6,7 @@ import {
   ExclamationCircleIcon, ChevronRightIcon
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid';
-import axios from 'axios';
+import api from '../lib/api';
 import ImageCarousel from '../components/ImageCarousel';
 import AdCard from '../components/AdCard';
 import { useAuth } from '../context/AuthContext';
@@ -28,14 +28,14 @@ export default function AdDetailPage() {
       try {
         setLoading(true);
         const id = extractIdFromSlug(slug);
-        const { data } = await axios.get(`/api/ads/${id}`);
+        const { data } = await api.get(`/ads/${id}`);
         setAd(data);
         
         const viewerId = localStorage.getItem('ad_viewer_id') || `viewer_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         if (!localStorage.getItem('ad_viewer_id')) {
           localStorage.setItem('ad_viewer_id', viewerId);
         }
-        axios.post('/api/views/track', { adId: id, page: 'detail', localStorageId: viewerId }).catch(console.error);
+        api.post('/views/track', { adId: id, page: 'detail', localStorageId: viewerId }).catch(console.error);
         
         // Redirect if slug is incorrect/outdated for SEO
         const correctSlug = generateAdSlug(data);
@@ -43,7 +43,7 @@ export default function AdDetailPage() {
           navigate(`/ads/${correctSlug}`, { replace: true });
         }
         if (user) {
-          const { data: favData } = await axios.get(`/api/favorites/check/${data._id}`);
+          const { data: favData } = await api.get(`/favorites/check/${data._id}`);
           setFavorited(favData.favorited);
         }
         setError(null);
@@ -60,7 +60,7 @@ export default function AdDetailPage() {
   const toggleFav = async () => {
     if (!user) return navigate('/login');
     try {
-      const { data } = await axios.post(`/api/favorites/${ad._id}`);
+      const { data } = await api.post(`/favorites/${ad._id}`);
       setFavorited(data.favorited);
     } catch (err) {
       console.error(err);
@@ -177,11 +177,17 @@ export default function AdDetailPage() {
 
             {/* Seller's other ads */}
             {ad.sellerAds?.length > 0 && (
-              <div>
-                <h3 style={{ fontSize: 20, fontWeight: 800, marginBottom: 16 }}>More from {ad.seller.name}</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(230px, 1fr))', gap: 16 }}>
+              <div className="mt-8">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xl font-black text-gray-900 tracking-tight">More from {ad.seller.name}</h3>
+                  <Link to={`/profile/${ad.seller._id}`} className="text-sm font-black text-orange-500 hover:text-orange-600 uppercase tracking-widest">View Profile &rarr;</Link>
+                </div>
+                
+                <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 overflow-x-auto sm:overflow-visible pb-6 sm:pb-0 hide-scroll snap-x snap-mandatory">
                   {ad.sellerAds.map(otherAd => (
-                    <AdCard key={otherAd._id} ad={otherAd} />
+                    <div key={otherAd._id} className="min-w-[240px] sm:min-w-0 snap-start">
+                      <AdCard ad={otherAd} />
+                    </div>
                   ))}
                 </div>
               </div>
@@ -194,15 +200,19 @@ export default function AdDetailPage() {
             <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e5e7eb', overflow: 'hidden' }}>
               <div style={{ padding: 20, borderBottom: '1px solid #f3f4f6' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                  {ad.seller.profilePhoto ? (
-                    <img src={ad.seller.profilePhoto} alt={ad.seller.name} style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover' }} />
-                  ) : (
-                    <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#3e6fe1', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, fontWeight: 800 }}>
-                      {ad.seller.name[0]}
-                    </div>
-                  )}
+                  <Link to={`/profile/${ad.seller._id}`}>
+                    {ad.seller.profilePhoto ? (
+                      <img src={ad.seller.profilePhoto} alt={ad.seller.name} style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover' }} />
+                    ) : (
+                      <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#3e6fe1', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, fontWeight: 800 }}>
+                        {ad.seller.name[0]}
+                      </div>
+                    )}
+                  </Link>
                   <div>
-                    <h4 style={{ fontWeight: 800, fontSize: 17 }}>{ad.seller.name}</h4>
+                    <Link to={`/profile/${ad.seller._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                      <h4 style={{ fontWeight: 800, fontSize: 17 }} className="hover:text-primary transition-colors">{ad.seller.name}</h4>
+                    </Link>
                     <p style={{ fontSize: 13, color: '#6b7280', marginTop: 2 }}>Member since {new Date(ad.seller.createdAt).getFullYear()}</p>
                     {ad.seller.badges && ad.seller.badges.length > 0 && (
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 6 }}>

@@ -3,7 +3,7 @@ import { TrashIcon, ShoppingBagIcon, ArrowLeftIcon, TagIcon } from '@heroicons/r
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useState } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
 
 const SHIPPING_THRESHOLD = 50;
 
@@ -53,7 +53,7 @@ export default function CartPage() {
       setIsPlacingOrder(true);
       setOrderError('');
 
-      await axios.post('/api/orders', {
+      await api.post('/orders', {
         orderItems: items.map(item => ({
           ...item,
           qty: item.quantity,

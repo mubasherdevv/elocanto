@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../lib/api';
 import { 
   UserCircleIcon, ShoppingBagIcon, HeartIcon, 
   ChatBubbleLeftRightIcon, Cog6ToothIcon, PencilIcon,
-  TrashIcon, EyeIcon, ChevronRightIcon, ArrowTopRightOnSquareIcon
+  TrashIcon, EyeIcon, ChevronRightIcon, ArrowTopRightOnSquareIcon, CalendarIcon
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../context/AuthContext';
 import AdCard from '../components/AdCard';
@@ -50,7 +50,7 @@ export default function UserDashboardPage() {
 
   const fetchSettings = async () => {
     try {
-      const { data } = await axios.get('/api/settings');
+      const { data } = await api.get('/settings');
       setSettings(data);
     } catch (err) {
       console.error('Error fetching settings:', err);
@@ -65,7 +65,7 @@ export default function UserDashboardPage() {
   const fetchMyAds = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get('/api/ads/my');
+      const { data } = await api.get('/ads/my');
       setMyAds(data);
     } catch (err) {
       console.error(err);
@@ -77,7 +77,7 @@ export default function UserDashboardPage() {
   const fetchFavorites = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get('/api/favorites');
+      const { data } = await api.get('/favorites');
       setFavorites(data);
     } catch (err) {
       console.error(err);
@@ -95,7 +95,7 @@ export default function UserDashboardPage() {
   const handleDeleteAd = async (id) => {
     if (window.confirm('Are you sure you want to delete this ad?')) {
       try {
-        await axios.delete(`/api/ads/${id}`);
+        await api.delete(`/ads/${id}`);
         setMyAds(myAds.filter(ad => ad._id !== id));
       } catch (err) {
         alert(err.response?.data?.message || 'Delete failed');
@@ -109,7 +109,7 @@ export default function UserDashboardPage() {
       const duration = ad.isFeatured ? (settings?.featuredAdsDuration || 7) : (settings?.simpleAdsDuration || 30);
       const newExpiresAt = new Date();
       newExpiresAt.setDate(newExpiresAt.getDate() + duration);
-      await axios.put(`/api/ads/${ad._id}`, { expiresAt: newExpiresAt, isActive: true });
+      await api.put(`/ads/${ad._id}`, { expiresAt: newExpiresAt, isActive: true });
       alert(`Ad renewed for ${duration} days!`);
       fetchMyAds();
     } catch (err) {
@@ -136,119 +136,132 @@ export default function UserDashboardPage() {
   return (
     <div className="page-wrapper container-custom" style={{ background: '#f7f8fa' }}>
       <div className="dashboard-layout flex flex-col lg:grid lg:grid-cols-[260px_1fr] gap-8">
-        {/* Sidebar */}
-        <aside style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <div style={{ background: 'white', borderRadius: 16, padding: 24, border: '1px solid #e5e7eb', textAlign: 'center', marginBottom: 16 }}>
+        {/* Sidebar / Mobile Tabs */}
+        <aside className="flex flex-col gap-4">
+          {/* Profile Card - Hidden on mobile to save space, or simplified */}
+          <div className="hidden lg:block bg-white rounded-2xl p-6 border border-gray-100 text-center mb-4">
             {user.profilePhoto ? (
-              <img src={user.profilePhoto} style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', margin: '0 auto 12px' }} />
+              <img src={user.profilePhoto} className="w-20 h-20 rounded-full object-cover mx-auto mb-3 shadow-sm" />
             ) : (
-              <div style={{ width: 80, height: 80, borderRadius: '50%', background: '#3e6fe1', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, fontWeight: 800, margin: '0 auto 12px' }}>
+              <div className="w-20 h-20 rounded-full bg-orange-500 text-white flex items-center justify-center text-3xl font-black mx-auto mb-3">
                 {user.name[0]}
               </div>
             )}
-            <h3 style={{ fontWeight: 800, fontSize: 18 }}>{user.name}</h3>
-            <p style={{ fontSize: 12, color: '#6b7280', marginTop: 4 }}>{user.email}</p>
-            {user?.badges && user?.badges.length > 0 && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, justifyContent: 'center', marginTop: 8 }}>
-                {user.badges.map(badge => (
-                  <span key={badge} style={{ background: '#eef2ff', color: '#4f46e5', fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 4, textTransform: 'capitalize', border: '1px solid #e0e7ff' }} title={badge && typeof badge === 'string' ? badge.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()) : ''}>
-                    {badge && typeof badge === 'string' ? badge.replace(/([A-Z])/g, ' $1') : badge}
-                  </span>
-                ))}
-              </div>
-            )}
+            <h3 className="font-black text-lg text-gray-900">{user.name}</h3>
+            <p className="text-xs text-gray-500 mt-1">{user.email}</p>
             {user.createdAt && (
-              <p style={{ fontSize: 11, color: '#9ca3af', marginTop: 4 }}>
-                Joined {new Date(user.createdAt).toLocaleDateString('en-PK', { month: 'short', year: 'numeric' })}
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-3">
+                Since {new Date(user.createdAt).getFullYear()}
               </p>
             )}
           </div>
 
-          {tabs.map(tab => (
-            <Link key={tab.id} to={`/dashboard?tab=${tab.id}`} style={sidebarItemStyle(tab.id)}>
-              {tab.icon} {tab.label}
-            </Link>
-          ))}
-
-          <button 
-            onClick={() => { logout(); navigate('/'); }}
-            style={{ 
-              marginTop: 20, display: 'flex', alignItems: 'center', gap: 12, 
-              padding: '12px 16px', borderRadius: 12, border: 'none', background: 'none',
-              cursor: 'pointer', fontSize: 14, fontWeight: 700, color: '#dc2626'
-            }}
-          >
-            🚪 Logout
-          </button>
+          {/* Desktop/Mobile Navigation */}
+          <div className="flex flex-row lg:flex-col overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 gap-2 hide-scroll no-scrollbar">
+            {tabs.map(tab => (
+              <Link 
+                key={tab.id} 
+                to={`/dashboard?tab=${tab.id}`} 
+                className={`flex items-center gap-3 px-5 py-3 rounded-xl text-sm font-black transition-all whitespace-nowrap lg:w-full ${
+                  activeTab === tab.id 
+                    ? 'bg-orange-500 text-white shadow-lg shadow-orange-200' 
+                    : 'bg-white text-gray-500 hover:bg-gray-50'
+                }`}
+              >
+                {tab.icon} {tab.label}
+              </Link>
+            ))}
+            
+            <button 
+              onClick={() => { logout(); navigate('/'); }}
+              className="flex items-center gap-3 px-5 py-3 rounded-xl text-sm font-black text-red-500 bg-white hover:bg-red-50 transition-all whitespace-nowrap lg:w-full lg:mt-4"
+            >
+              🚪 Logout
+            </button>
+          </div>
         </aside>
 
         {/* Content Area */}
-        <div style={{ minWidth: 0 }}>
+        <div className="min-w-0">
           {activeTab === 'ads' && (
             <div className="fade-in">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-                <h2 style={{ fontWeight: 800, fontSize: 22 }}>My Advertisements</h2>
-                <Link to="/post-ad" className="btn-primary" style={{ fontSize: 13, padding: '8px 16px' }}>+ Post New Ad</Link>
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+                <h2 className="text-2xl font-black text-gray-900 tracking-tight">Account Overview</h2>
+                <Link to="/post-ad" className="btn-primary w-full sm:w-auto justify-center rounded-xl py-3 px-6 font-black tracking-tight">+ Post New Ad</Link>
               </div>
 
               {/* User Analytics Grid */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 16, marginBottom: 32 }}>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-10">
                 {[
-                  { label: 'Total Ads', value: myAds.length },
-                  { label: 'Approved', value: myAds.filter(a => a.isApproved).length },
-                  { label: 'Pending', value: myAds.filter(a => !a.isApproved).length },
-                  { label: 'Featured', value: myAds.filter(a => a.isFeatured).length },
-                  { label: 'Simple', value: myAds.filter(a => !a.isFeatured).length }
+                  { label: 'Total Ads', value: myAds.length, bg: 'bg-blue-50', text: 'text-blue-600' },
+                  { label: 'Approved', value: myAds.filter(a => a.isApproved).length, bg: 'bg-green-50', text: 'text-green-600' },
+                  { label: 'Pending', value: myAds.filter(a => !a.isApproved).length, bg: 'bg-orange-50', text: 'text-orange-600' },
+                  { label: 'Featured', value: myAds.filter(a => a.isFeatured).length, bg: 'bg-purple-50', text: 'text-purple-600' },
+                  { label: 'Expired', value: myAds.filter(a => a.expiresAt && new Date(a.expiresAt) < new Date()).length, bg: 'bg-red-50', text: 'text-red-600' }
                 ].map(stat => (
-                  <div key={stat.label} style={{ background: 'white', padding: 16, borderRadius: 16, border: '1px solid #e5e7eb', textAlign: 'center' }}>
-                    <p style={{ fontSize: 10, fontWeight: 800, color: '#6b7280', textTransform: 'uppercase', letterSpacing: 0.5 }}>{stat.label}</p>
-                    <p style={{ fontSize: 24, fontWeight: 900, color: 'var(--dark)', marginTop: 4 }}>{stat.value}</p>
+                  <div key={stat.label} className={`${stat.bg} p-5 rounded-2xl border border-white shadow-sm text-center`}>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{stat.label}</p>
+                    <p className={`text-2xl font-black ${stat.text}`}>{stat.value}</p>
                   </div>
                 ))}
               </div>
-              {loading ? <div className="spinner" style={{ margin: '40px auto' }}></div> : (
+
+              {loading ? <div className="py-20 flex-center"><div className="spinner"></div></div> : (
                 myAds.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '60px 0', background: 'white', borderRadius: 16, border: '1px solid #e5e7eb' }}>
-                    <ShoppingBagIcon style={{ width: 48, height: 48, color: '#e5e7eb', margin: '0 auto 16px' }} />
-                    <p style={{ color: '#6b7280' }}>You haven't posted any ads yet.</p>
+                  <div className="text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
+                    <ShoppingBagIcon className="w-16 h-16 text-gray-200 mx-auto mb-4" />
+                    <p className="text-gray-500 font-bold">You haven't posted any ads yet.</p>
                   </div>
                 ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  <div className="space-y-4">
                     {myAds.map(ad => (
-                      <div key={ad._id} style={{ background: 'white', borderRadius: 16, border: '1px solid #e5e7eb', padding: 16, display: 'flex', gap: 16, alignItems: 'center' }}>
-                        <img 
-                          src={ad.images?.[0] ? (ad.images[0].startsWith('http') ? ad.images[0] : `http://localhost:5000${ad.images[0]}`) : 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200'} 
-                          style={{ width: 100, height: 80, borderRadius: 12, objectFit: 'cover' }} 
-                        />
-                        <div style={{ flex: 1 }}>
-                          <h4 style={{ fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <div key={ad._id} className="bg-white rounded-3xl border border-gray-100 p-4 flex flex-col sm:flex-row gap-6 hover:shadow-xl transition-all duration-300 group overflow-hidden relative">
+                        {/* Status Badge Over Image */}
+                        <div className="absolute top-6 left-6 z-10">
+                          <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm ${
+                            ad.isApproved ? 'bg-green-500 text-white' : 'bg-orange-500 text-white'
+                          }`}>
+                            {ad.isApproved ? 'Active' : 'Pending'}
+                          </span>
+                        </div>
+
+                        <div className="sm:w-48 h-40 sm:h-32 rounded-2xl overflow-hidden flex-shrink-0 bg-gray-50 relative">
+                          <img 
+                            src={ad.images?.[0] ? (ad.images[0].startsWith('http') ? ad.images[0] : `http://localhost:5000${ad.images[0]}`) : 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400'} 
+                            className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500" 
+                          />
+                        </div>
+
+                        <div className="flex-1 min-w-0 flex flex-col justify-center">
+                          <h4 className="font-black text-lg text-gray-900 group-hover:text-orange-500 transition-colors truncate">
                             {ad.title}
-                            {user?.badges?.slice(0, 1).map(badge => (
-                              <span key={badge} style={{ background: '#eef2ff', color: '#4f46e5', fontSize: 9, fontWeight: 800, padding: '1px 4px', borderRadius: 4, textTransform: 'capitalize' }}>
-                                {badge}
-                              </span>
-                            ))}
                           </h4>
-                          <p style={{ fontWeight: 800, color: '#3e6fe1', marginTop: 4 }}>PKR {ad.price.toLocaleString()}</p>
-                          <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
-                            <span style={{ fontSize: 11, color: '#9ca3af' }}>Views: {ad.views}</span>
-                            <span style={{ fontSize: 11, color: '#9ca3af' }}>{new Date(ad.createdAt).toLocaleDateString()}</span>
-                            <span className="badge badge-success" style={{ fontSize: 9 }}>{ad.isApproved ? 'Active' : 'Pending'}</span>
+                          <p className="text-xl font-black text-orange-500 mt-1">PKR {ad.price.toLocaleString()}</p>
+                          
+                          <div className="flex flex-wrap items-center gap-4 mt-4 text-[11px] font-black text-gray-400 uppercase tracking-widest">
+                            <span className="flex items-center gap-1.5"><EyeIcon className="w-3.5 h-3.5" /> {ad.views} Views</span>
+                            <span className="flex items-center gap-1.5"><CalendarIcon className="w-3.5 h-3.5" /> {new Date(ad.createdAt).toLocaleDateString()}</span>
                             {ad.expiresAt && (
-                              <span style={{ fontSize: 11, color: new Date(ad.expiresAt) < new Date() ? '#dc2626' : '#059669' }}>
+                              <span className={`flex items-center gap-1.5 ${new Date(ad.expiresAt) < new Date() ? 'text-red-500' : 'text-green-600'}`}>
+                                <ShoppingBagIcon className="w-3.5 h-3.5" />
                                 {new Date(ad.expiresAt) < new Date() ? 'Expired' : `Expires: ${new Date(ad.expiresAt).toLocaleDateString()}`}
                               </span>
                             )}
                           </div>
                         </div>
-                        <div style={{ display: 'flex', gap: 10 }}>
-                          <Link to={`/ads/${generateAdSlug(ad)}`} className="btn-ghost" title="View"><EyeIcon style={{ width: 20, height: 20 }} /></Link>
+
+                        <div className="flex flex-row sm:flex-col justify-end gap-2 border-t sm:border-t-0 sm:border-l border-gray-50 pt-4 sm:pt-0 sm:pl-6">
+                          <Link to={`/ads/${generateAdSlug(ad)}`} className="flex-1 sm:flex-initial p-3 bg-gray-50 hover:bg-blue-50 text-blue-600 rounded-xl transition-colors flex items-center justify-center" title="View">
+                             <EyeIcon className="w-5 h-5" />
+                          </Link>
                           {ad.expiresAt && new Date(ad.expiresAt) < new Date() && (
-                            <button onClick={() => handleRenewAd(ad)} className="btn-ghost" style={{ color: '#eab308' }} title={`Renew (${ad.isFeatured ? (settings?.featuredAdsDuration || 7) : (settings?.simpleAdsDuration || 30)} days)`}>
-                              <ArrowTopRightOnSquareIcon style={{ width: 20, height: 20 }} />
+                            <button onClick={() => handleRenewAd(ad)} className="flex-1 sm:flex-initial p-3 bg-yellow-50 hover:bg-yellow-100 text-yellow-600 rounded-xl transition-colors flex items-center justify-center" title="Renew">
+                              <ArrowTopRightOnSquareIcon className="w-5 h-5" />
                             </button>
                           )}
-                          <button onClick={() => handleDeleteAd(ad._id)} className="btn-ghost" style={{ color: '#dc2626' }} title="Delete"><TrashIcon style={{ width: 20, height: 20 }} /></button>
+                          <button onClick={() => handleDeleteAd(ad._id)} className="flex-1 sm:flex-initial p-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl transition-colors flex items-center justify-center" title="Delete">
+                            <TrashIcon className="w-5 h-5" />
+                          </button>
                         </div>
                       </div>
                     ))}
@@ -260,15 +273,15 @@ export default function UserDashboardPage() {
 
           {activeTab === 'favorites' && (
             <div className="fade-in">
-              <h2 style={{ fontWeight: 800, fontSize: 22, marginBottom: 24 }}>Saved Items</h2>
-              {loading ? <div className="spinner" style={{ margin: '40px auto' }}></div> : (
+              <h2 className="text-2xl font-black text-gray-900 tracking-tight mb-8">Saved Items</h2>
+              {loading ? <div className="py-20 flex-center"><div className="spinner"></div></div> : (
                 favorites.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '60px 0', background: 'white', borderRadius: 16, border: '1px solid #e5e7eb' }}>
-                    <HeartIcon style={{ width: 48, height: 48, color: '#e5e7eb', margin: '0 auto 16px' }} />
-                    <p style={{ color: '#6b7280' }}>No favorite ads yet.</p>
+                  <div className="text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
+                    <HeartIcon className="w-16 h-16 text-gray-200 mx-auto mb-4" />
+                    <p className="text-gray-500 font-bold">No favorite ads yet.</p>
                   </div>
                 ) : (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 20 }}>
+                  <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                     {favorites.map(ad => (
                       <AdCard key={ad._id} ad={ad} initialFav={true} onFavToggle={(id, fav) => !fav && setFavorites(favorites.filter(f => f._id !== id))} />
                     ))}
@@ -280,53 +293,60 @@ export default function UserDashboardPage() {
 
           {activeTab === 'messages' && (
             <div className="fade-in">
-              <h2 style={{ fontWeight: 800, fontSize: 22, marginBottom: 24 }}>Your Chats</h2>
-              <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e5e7eb', overflow: 'hidden' }}>
-                <p style={{ padding: 40, textAlign: 'center', color: '#6b7280' }}>
-                  Click "View All Messages" to open the messaging portal.
-                  <br />
-                  <Link to="/messages" className="btn-primary mt-4">View All Messages</Link>
-                </p>
+              <h2 className="text-2xl font-black text-gray-900 tracking-tight mb-8">Your Chats</h2>
+              <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden text-center py-20 px-6">
+                <ChatBubbleLeftRightIcon className="w-16 h-16 text-gray-200 mx-auto mb-6" />
+                <h3 className="text-xl font-black text-gray-900 mb-2">Message Center</h3>
+                <p className="text-gray-500 mb-8 max-w-sm mx-auto">Click the button below to open the professional messaging portal and check your inquiries.</p>
+                <Link to="/messages" className="btn-primary inline-flex py-4 px-8 rounded-2xl font-black">View All Messages</Link>
               </div>
             </div>
           )}
 
           {activeTab === 'settings' && (
-            <div className="fade-in" style={{ background: 'white', borderRadius: 16, border: '1px solid #e5e7eb', padding: 32 }}>
-              <h2 style={{ fontWeight: 800, fontSize: 22, marginBottom: 24 }}>Profile Settings</h2>
-              <form onSubmit={handleUpdate} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+            <div className="fade-in bg-white rounded-3xl border border-gray-100 p-6 sm:p-10 shadow-sm">
+              <div className="mb-10">
+                <h2 className="text-2xl font-black text-gray-900 tracking-tight">Profile Settings</h2>
+                <p className="text-gray-500 mt-1 font-medium">Update your account information and preferences.</p>
+              </div>
+              
+              <form onSubmit={handleUpdate} className="space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div>
-                    <label className="filter-label">Full Name</label>
-                    <input type="text" className="input-field" value={profileData.name} onChange={e => setProfileData({...profileData, name: e.target.value})} />
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">Full Name</label>
+                    <input type="text" className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-5 py-4 font-bold text-gray-900 focus:border-orange-500 transition-colors outline-none" value={profileData.name} onChange={e => setProfileData({...profileData, name: e.target.value})} />
                   </div>
                   <div>
-                    <label className="filter-label">Phone Number</label>
-                    <input type="text" className="input-field" value={profileData.phone} onChange={e => setProfileData({...profileData, phone: e.target.value})} />
-                  </div>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-                  <div>
-                    <label className="filter-label">Email Address</label>
-                    <input type="email" className="input-field" value={profileData.email} onChange={e => setProfileData({...profileData, email: e.target.value})} />
-                  </div>
-                  <div>
-                    <label className="filter-label">New Password (leave blank to keep current)</label>
-                    <input type="password" className="input-field" value={profileData.password} onChange={e => setProfileData({...profileData, password: e.target.value})} placeholder="••••••••" />
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">Phone Number</label>
+                    <input type="text" className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-5 py-4 font-bold text-gray-900 focus:border-orange-500 transition-colors outline-none" value={profileData.phone} onChange={e => setProfileData({...profileData, phone: e.target.value})} />
                   </div>
                 </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div>
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">Email Address</label>
+                    <input type="email" className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-5 py-4 font-bold text-gray-400 focus:border-orange-500 transition-colors outline-none opacity-60 cursor-not-allowed" value={profileData.email} disabled />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">New Password</label>
+                    <input type="password" className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-5 py-4 font-bold text-gray-900 focus:border-orange-500 transition-colors outline-none" value={profileData.password} onChange={e => setProfileData({...profileData, password: e.target.value})} placeholder="••••••••" />
+                  </div>
+                </div>
+
                 <div>
-                  <label className="filter-label">City</label>
-                  <select className="input-field" value={profileData.city} onChange={e => setProfileData({...profileData, city: e.target.value})}>
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">City</label>
+                  <select className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-5 py-4 font-bold text-gray-900 focus:border-orange-500 transition-colors outline-none cursor-pointer" value={profileData.city} onChange={e => setProfileData({...profileData, city: e.target.value})}>
                     <option value="">Select City</option>
                     {['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Peshawar', 'Quetta', 'Multan', 'Faisalabad'].map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
+
                 <div>
-                  <label className="filter-label">Bio (Optional)</label>
-                  <textarea className="input-field" style={{ minHeight: 80 }} value={profileData.bio} onChange={e => setProfileData({...profileData, bio: e.target.value})}></textarea>
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">Bio (Optional)</label>
+                  <textarea className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-5 py-4 font-bold text-gray-900 focus:border-orange-500 transition-colors outline-none min-h-[120px]" value={profileData.bio} onChange={e => setProfileData({...profileData, bio: e.target.value})} placeholder="Tell us something about yourself..."></textarea>
                 </div>
-                <button type="submit" className="btn-primary" style={{ alignSelf: 'flex-start', padding: '12px 32px' }}>Save Changes</button>
+
+                <button type="submit" className="btn-primary w-full sm:w-auto py-4 px-12 rounded-2xl font-black text-lg shadow-xl shadow-orange-200">Save Profile</button>
               </form>
             </div>
           )}

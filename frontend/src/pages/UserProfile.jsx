@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import api from '../lib/api';
 import AdCard from '../components/AdCard';
 import { 
   MapPinIcon, 
@@ -43,7 +43,7 @@ export default function UserProfile() {
   const fetchProfileData = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get(isOwnProfile ? '/api/users/profile' : `/api/users/${userId}`);
+      const { data } = await api.get(isOwnProfile ? '/users/profile' : `/users/${userId}/public`);
       const targetUser = data;
       
       setProfileUser(targetUser);
@@ -56,7 +56,7 @@ export default function UserProfile() {
         });
 
         // Fetch Ads
-        const adsRes = await axios.get(isOwnProfile ? '/api/ads/my' : `/api/ads/seller/${targetUser._id}`);
+        const adsRes = await api.get(isOwnProfile ? '/ads/my' : `/ads/seller/${targetUser._id}`);
         setAds(adsRes.data);
       }
     } catch (err) {
@@ -157,17 +157,19 @@ export default function UserProfile() {
           <section>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
               <h2 className="text-2xl font-black text-gray-900 tracking-tight">{isOwnProfile ? 'My' : profileUser.name + "'s"} Advertisements</h2>
-              <div className="flex bg-gray-200/50 p-1 rounded-xl">
-                {['active', 'expired', 'sold'].map(tab => (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    className={`px-5 py-2 rounded-lg text-sm font-bold capitalize transition-all duration-300 ${activeTab === tab ? 'bg-white text-orange-500 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                  >
-                    {tab}
-                  </button>
-                ))}
-              </div>
+              {isOwnProfile && (
+                <div className="flex bg-gray-200/50 p-1 rounded-xl">
+                  {['active', 'expired', 'sold'].map(tab => (
+                    <button
+                      key={tab}
+                      onClick={() => setActiveTab(tab)}
+                      className={`px-5 py-2 rounded-lg text-sm font-bold capitalize transition-all duration-300 ${activeTab === tab ? 'bg-white text-orange-500 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                    >
+                      {tab}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {filteredAds.length > 0 ? (

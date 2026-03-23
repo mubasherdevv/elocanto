@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
 import { 
   ExclamationTriangleIcon, 
   CheckCircleIcon, 
@@ -77,14 +77,12 @@ function AdminLogsTab() {
   const fetchLogs = async () => {
     try {
       setLoading(true);
-      if (!token) return;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
       const params = new URLSearchParams({
         page: pagination.page,
         limit: pagination.limit,
         ...Object.fromEntries(Object.entries(filters).filter(([_, v]) => v))
       });
-      const { data } = await axios.get(`/api/admin/logs/admin?${params}`, config);
+      const { data } = await api.get(`/admin/logs/admin?${params}`);
       setLogs(data.logs);
       setPagination(prev => ({ ...prev, ...data.pagination }));
     } catch (err) {
@@ -97,8 +95,7 @@ function AdminLogsTab() {
   const fetchActionTypes = async () => {
     try {
       if (!token) return;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const { data } = await axios.get('/api/admin/logs/types?type=admin', config);
+      const { data } = await api.get('/admin/logs/types?type=admin');
       setActionTypes(data);
     } catch (err) {
       console.error('Error fetching action types:', err);
@@ -281,14 +278,12 @@ function UserLogsTab() {
   const fetchLogs = async () => {
     try {
       setLoading(true);
-      if (!token) return;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
       const params = new URLSearchParams({
         page: pagination.page,
         limit: pagination.limit,
         ...Object.fromEntries(Object.entries(filters).filter(([_, v]) => v))
       });
-      const { data } = await axios.get(`/api/admin/logs/user?${params}`, config);
+      const { data } = await api.get(`/admin/logs/user?${params}`);
       setLogs(data.logs);
       setPagination(prev => ({ ...prev, ...data.pagination }));
     } catch (err) {
@@ -301,8 +296,7 @@ function UserLogsTab() {
   const fetchActionTypes = async () => {
     try {
       if (!token) return;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const { data } = await axios.get('/api/admin/logs/types?type=user', config);
+      const { data } = await api.get('/admin/logs/types?type=user');
       setActionTypes(data);
     } catch (err) {
       console.error('Error fetching action types:', err);
@@ -501,8 +495,7 @@ function ReportsContent() {
       setLoading(true);
       setError(null);
       if (!token) return;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const { data } = await axios.get('/api/admin/reports', config);
+      const { data } = await api.get('/admin/reports');
       setReports(data || []);
     } catch (err) {
       console.error('Error fetching reports:', err);
@@ -515,8 +508,7 @@ function ReportsContent() {
   const handleStatusChange = async (id, status) => {
     try {
       if (!token) return;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.put(`/api/admin/reports/${id}`, { status }, config);
+      await api.put(`/admin/reports/${id}`, { status });
       fetchReports();
     } catch (err) {
       console.error('Error updating report status:', err);
@@ -528,9 +520,8 @@ function ReportsContent() {
     if (window.confirm('Delete this reported ad? This will also resolve the report.')) {
       try {
         if (!token) return;
-        const config = { headers: { Authorization: `Bearer ${token}` } };
-        await axios.delete(`/api/ads/${adId}`, config);
-        await axios.put(`/api/admin/reports/${reportId}`, { status: 'resolved', adminNotes: 'Ad deleted by admin.' }, config);
+        await api.delete(`/ads/${adId}`);
+        await api.put(`/admin/reports/${reportId}`, { status: 'resolved', adminNotes: 'Ad deleted by admin.' });
         fetchReports();
       } catch (err) {
         console.error('Error deleting ad from report:', err);

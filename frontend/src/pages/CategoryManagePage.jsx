@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../lib/api';
 import {
   PlusIcon,
   PencilSquareIcon,
@@ -56,8 +56,8 @@ export default function CategoryManagePage() {
     try {
       setLoading(true);
       const [catRes, subRes] = await Promise.all([
-        axios.get('/api/categories'),
-        axios.get('/api/subcategories')
+        api.get('/categories'),
+        api.get('/subcategories')
       ]);
       setCategories(catRes.data);
       setSubcategories(subRes.data);
@@ -70,8 +70,7 @@ export default function CategoryManagePage() {
 
   const fetchStats = async () => {
     try {
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const { data } = await axios.get('/api/admin/analytics', config);
+      const { data } = await api.get('/admin/analytics');
       if (data.stats) {
         setStats({
           totalAds: data.stats.totalAds,
@@ -105,14 +104,13 @@ export default function CategoryManagePage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const endpoint = modalType === 'category' ? '/api/categories' : '/api/subcategories';
+      const endpoint = modalType === 'category' ? '/categories' : '/subcategories';
 
       if (editingItem) {
-        await axios.put(`${endpoint}/${editingItem._id}`, formData, config);
+        await api.put(`${endpoint}/${editingItem._id}`, formData);
         setMessage(`${modalType === 'category' ? 'Category' : 'Subcategory'} updated!`);
       } else {
-        await axios.post(endpoint, formData, config);
+        await api.post(endpoint, formData);
         setMessage(`${modalType === 'category' ? 'Category' : 'Subcategory'} created!`);
       }
 
@@ -129,9 +127,8 @@ export default function CategoryManagePage() {
   const handleDelete = async (type, id) => {
     if (window.confirm(`Delete this ${type}? This action cannot be undone.`)) {
       try {
-        const config = { headers: { Authorization: `Bearer ${token}` } };
-        const endpoint = type === 'category' ? '/api/categories' : '/api/subcategories';
-        await axios.delete(`${endpoint}/${id}`, config);
+        const endpoint = type === 'category' ? '/categories' : '/subcategories';
+        await api.delete(`${endpoint}/${id}`);
         fetchData();
         fetchStats();
       } catch (err) {

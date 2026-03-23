@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
 import { 
   MagnifyingGlassIcon, 
   UserGroupIcon, 
@@ -81,14 +81,7 @@ export default function AdminUsersPage() {
       setLoading(true);
       setError(null);
       
-      if (!token) {
-        setError('Session expired. Please login as an admin.');
-        setLoading(false);
-        return;
-      }
-
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const { data } = await axios.get('/api/users/admin/all', config); 
+      const { data } = await api.get('/users/admin/all'); 
       setUsers(data);
     } catch (err) {
       console.error('Error fetching users:', err);
@@ -101,8 +94,7 @@ export default function AdminUsersPage() {
   const fetchUserAds = async (userId) => {
     try {
       setAdsLoading(true);
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const { data } = await axios.get(`/api/ads/admin/user/${userId}`, config);
+      const { data } = await api.get(`/ads/admin/user/${userId}`);
       setUserAds(data);
     } catch (err) {
       console.error('Error fetching user ads:', err);
@@ -114,12 +106,10 @@ export default function AdminUsersPage() {
   const handleCreateOrUpdate = async (e) => {
     e.preventDefault();
     try {
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      
       if (editingUser) {
-        await axios.put(`/api/users/admin/${editingUser._id}`, formData, config);
+        await api.put(`/users/admin/${editingUser._id}`, formData);
       } else {
-        await axios.post('/api/users/admin/create', formData, config);
+        await api.post('/users/admin/create', formData);
       }
       
       setView('list');
@@ -134,8 +124,7 @@ export default function AdminUsersPage() {
   const deleteUser = async (id) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
       try {
-        const config = { headers: { Authorization: `Bearer ${token}` } };
-        await axios.delete(`/api/users/admin/${id}`, config);
+        await api.delete(`/users/admin/${id}`);
         fetchUsers();
       } catch (err) {
         alert('Failed to delete user');
@@ -145,8 +134,7 @@ export default function AdminUsersPage() {
 
   const toggleBan = async (id) => {
     try {
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.put(`/api/users/admin/${id}/ban`, {}, config);
+      await api.put(`/users/admin/${id}/ban`, {});
       fetchUsers();
     } catch (err) {
       console.error('Error toggling ban:', err);
@@ -772,8 +760,7 @@ export default function AdminUsersPage() {
               <button 
                 onClick={async () => {
                   try {
-                    const config = { headers: { Authorization: `Bearer ${token}` } };
-                    await axios.put(`/api/users/admin/${badgeUser._id}`, { badges: selectedBadges }, config);
+                    await api.put(`/users/admin/${badgeUser._id}`, { badges: selectedBadges });
                     setShowBadgeModal(false);
                     fetchUsers();
                   } catch (err) {

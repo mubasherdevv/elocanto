@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
 import { PlusIcon, PencilSquareIcon, TrashIcon, ExclamationCircleIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../context/AuthContext';
 import ReactQuill from 'react-quill-new';
@@ -61,7 +61,7 @@ export default function AdminSeoPage() {
   const fetchContents = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get('/api/seo', config);
+      const { data } = await api.get('/seo');
       setContents(data);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch contents');
@@ -94,10 +94,10 @@ export default function AdminSeoPage() {
 
     try {
       if (editingId) {
-        await axios.put(`/api/seo/${editingId}`, payload, config);
+        await api.put(`/seo/${editingId}`, payload);
         setSuccess('Content updated successfully!');
       } else {
-        await axios.post('/api/seo', payload, config);
+        await api.post('/seo', payload);
         setSuccess('Content created successfully!');
       }
       setIsModalOpen(false);
@@ -112,7 +112,7 @@ export default function AdminSeoPage() {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this content?')) return;
     try {
-      await axios.delete(`/api/seo/${id}`, config);
+      await api.delete(`/seo/${id}`);
       setSuccess('Deleted successfully');
       fetchContents();
       setTimeout(() => setSuccess(''), 3000);

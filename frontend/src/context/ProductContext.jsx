@@ -1,5 +1,4 @@
-import { createContext, useReducer, useEffect } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
 
 const ProductContext = createContext();
 
@@ -33,7 +32,7 @@ export const ProductProvider = ({ children }) => {
     try {
       dispatch({ type: 'FETCH_PRODUCTS_REQUEST' });
       
-      let url = '/api/products';
+      let url = '/products';
       const params = new URLSearchParams();
       if (keyword) params.append('keyword', keyword);
       if (category) params.append('category', category);
@@ -42,7 +41,7 @@ export const ProductProvider = ({ children }) => {
         url += `?${params.toString()}`;
       }
 
-      const { data } = await axios.get(url);
+      const { data } = await api.get(url);
       
       dispatch({ type: 'FETCH_PRODUCTS_SUCCESS', payload: data });
     } catch (error) {
@@ -59,9 +58,10 @@ export const ProductProvider = ({ children }) => {
     try {
       dispatch({ type: 'FETCH_PRODUCT_REQUEST' });
       
-      const { data } = await axios.get(`/api/products/${id}`);
+      const { data } = await api.get(`/products/${id}`);
       
       dispatch({ type: 'FETCH_PRODUCT_SUCCESS', payload: data });
+
     } catch (error) {
       dispatch({
         type: 'FETCH_FAIL',

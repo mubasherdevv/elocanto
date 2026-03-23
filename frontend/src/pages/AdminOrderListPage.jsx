@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
 import { XCircleIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 
 export default function AdminOrderListPage() {
@@ -13,7 +13,7 @@ export default function AdminOrderListPage() {
 
   const fetchOrders = async () => {
     try {
-      const { data } = await axios.get('/api/orders');
+      const { data } = await api.get('/orders');
       setOrders(data);
     } catch (err) {
       setError(err.response?.data?.message || err.message);
@@ -25,7 +25,7 @@ export default function AdminOrderListPage() {
   const deliverHandler = async (id) => {
     if (window.confirm('Are you sure you want to mark this order as delivered?')) {
       try {
-        await axios.put(`/api/orders/${id}/deliver`);
+        await api.put(`/orders/${id}/deliver`);
         fetchOrders();
       } catch (err) {
         alert(err.response?.data?.message || err.message);

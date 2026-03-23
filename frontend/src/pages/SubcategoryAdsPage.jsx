@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { ArrowLeftIcon, PhotoIcon } from '@heroicons/react/24/outline';
 
@@ -19,8 +19,7 @@ export default function SubcategoryAdsPage() {
   const fetchAds = async () => {
     try {
       setLoading(true);
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const { data } = await axios.get(`/api/subcategories/${id}/ads`, config);
+      const { data } = await api.get(`/subcategories/${id}/ads`);
       setAds(data);
     } catch (err) {
       console.error('Error fetching subcategory ads:', err);

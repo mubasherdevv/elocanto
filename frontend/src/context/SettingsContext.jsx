@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
 
 const SettingsContext = createContext();
 
@@ -11,7 +11,7 @@ export const SettingsProvider = ({ children }) => {
   const fetchSettings = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get('/api/settings');
+      const { data } = await api.get('/settings');
       setSettings(data);
       setError(null);
     } catch (err) {

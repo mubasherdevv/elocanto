@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../lib/api';
 import { PaperAirplaneIcon, MapPinIcon, ChevronLeftIcon } from '@heroicons/react/24/solid';
 import { UserCircleIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../context/AuthContext';
@@ -34,7 +34,7 @@ export default function MessagesPage() {
 
   const fetchConversations = async () => {
     try {
-      const { data } = await axios.get('/api/messages/conversations');
+      const { data } = await api.get('/messages/conversations');
       setConversations(data);
     } catch (err) {
       console.error(err);
@@ -44,7 +44,7 @@ export default function MessagesPage() {
   const startThread = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get(`/api/messages/thread/${sellerId}/${adId}`);
+      const { data } = await api.get(`/messages/thread/${sellerId}/${adId}`);
       setActiveConv({ _id: data.conversationId, other: data.seller, ad: { _id: adId } });
       setMessages(data.messages);
     } catch (err) {
@@ -58,7 +58,7 @@ export default function MessagesPage() {
     try {
       setLoading(true);
       setActiveConv(conv);
-      const { data } = await axios.get(`/api/messages/${conv.conversationId || conv._id}`);
+      const { data } = await api.get(`/messages/${conv.conversationId || conv._id}`);
       setMessages(data);
     } catch (err) {
       console.error(err);
@@ -72,7 +72,7 @@ export default function MessagesPage() {
     if (!inputText.trim() || !activeConv) return;
 
     try {
-      const { data } = await axios.post('/api/messages', {
+      const { data } = await api.post('/messages', {
         receiverId: activeConv.other._id,
         adId: activeConv.ad._id,
         text: inputText

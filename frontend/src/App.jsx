@@ -40,6 +40,7 @@ function App() {
             <Route element={<PublicLayout />}>
               <Route path="/" element={<HomePage />} />
               <Route path="/ads" element={<AdsListingPage />} />
+              <Route path="/profile/:userId" element={<UserProfile />} />
               <Route path="/ads/:slug" element={<AdDetailPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
@@ -50,7 +51,6 @@ function App() {
                 <Route path="/post-ad" element={<PostAdPage />} />
                 <Route path="/dashboard" element={<UserDashboardPage />} />
                 <Route path="/profile" element={<UserProfile />} />
-                <Route path="/profile/:userId" element={<UserProfile />} />
                 <Route path="/messages" element={<MessagesPage />} />
                 <Route path="/messages/:conversationId" element={<MessagesPage />} />
               </Route>
