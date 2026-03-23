@@ -1,10 +1,10 @@
-import { Resend } from 'resend';
+import * as SibApiV3Sdk from '@getbrevo/brevo';
 import dotenv from 'dotenv';
 import Settings from '../models/Settings.js';
 dotenv.config();
 
-// Initialize Resend with API Key from environment variables
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Create API instance
+const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
 const getSettings = async () => {
   return await Settings.findOne();
@@ -12,32 +12,34 @@ const getSettings = async () => {
 
 const sendEmail = async (to, subject, html) => {
   try {
-    if (!process.env.RESEND_API_KEY) {
-      console.error('RESEND_API_KEY not found in environment variables');
+    const apiKey = process.env.BREVO_API_KEY;
+    if (!apiKey) {
+      console.error('BREVO_API_KEY not found in environment variables');
       return false;
     }
+
+    // Configure API key
+    apiInstance.setApiKey(SibApiV3Sdk.TransactionalEmailsApiApiKeys.apiKey, apiKey);
 
     const settings = await getSettings();
     const fromName = settings?.emailSettings?.fromName || 'OLX Marketplace';
-    // Use onboarding@resend.dev as default if no custom domain is verified
-    const fromEmail = 'onboarding@resend.dev'; 
+    // For Brevo, if you don't have a verified domain, you can use any email 
+    // but it's better to use one that matches your settings or a placeholder
+    const fromEmail = settings?.emailSettings?.fromEmail || 'noreply@olx-marketplace.com';
 
-    const { data, error } = await resend.emails.send({
-      from: `${fromName} <${fromEmail}>`,
-      to: [to],
-      subject: subject,
-      html: html,
-    });
+    const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+    sendSmtpEmail.subject = subject;
+    sendSmtpEmail.htmlContent = html;
+    sendSmtpEmail.sender = { name: fromName, email: fromEmail };
+    sendSmtpEmail.to = [{ email: to }];
 
-    if (error) {
-      console.error('Resend error:', error);
-      return false;
-    }
-
-    console.log(`Email sent successfully to ${to}. ID: ${data.id}`);
+    const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log(`Email sent successfully to ${to}. Message ID: ${data.body.messageId}`);
     return true;
   } catch (error) {
-    console.error('Email error:', error.message);
+    // Brevo errors are often in error.response.body
+    const errorMsg = error.response?.body?.message || error.message;
+    console.error('Brevo API error:', errorMsg);
     return false;
   }
 };
@@ -95,6 +97,5 @@ export const sendPasswordChangeNotification = async (user) => {
 };
 
 export const reinitTransporter = async () => {
-  // Logic for reinitializing if needed, though Resend is stateless per request
-  console.log('Resend integration active.');
+  console.log('Brevo integration active.');
 };
