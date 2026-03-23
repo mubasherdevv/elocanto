@@ -25,25 +25,34 @@ const initTransporter = async () => {
 
   const isGmail = smtpHost.includes('gmail.com');
   
+  // Nuclear Option: resolve the address manually to ensure an IPv4 string is used as 'host'
+  let resolvedHost = smtpHost;
+  try {
+    const { address } = await dns.promises.lookup(smtpHost, { family: 4 });
+    resolvedHost = address;
+    console.log(`Resolved ${smtpHost} to IPv4: ${resolvedHost}`);
+  } catch (err) {
+    console.warn(`DNS lookup for ${smtpHost} failed, falling back to hostname line: ${err.message}`);
+  }
+
   const transportConfig = {
-    host: isGmail ? 'smtp.gmail.com' : smtpHost,
+    host: resolvedHost,
     port: isGmail ? 465 : smtpPort,
     secure: isGmail ? true : (smtpPort === 465),
     auth: {
       user: smtpUser?.trim(),
       pass: smtpPass?.trim(),
     },
-    family: 4, // Force IPv4
-    lookup: (hostname, options, callback) => {
-      return dns.lookup(hostname, { family: 4 }, callback);
-    },
+    family: 4, // Still force IPv4 just in case
     tls: {
       rejectUnauthorized: false,
-      minVersion: 'TLSv1.2'
+      minVersion: 'TLSv1.2',
+      servername: isGmail ? 'smtp.gmail.com' : undefined // Important when host is numeric IP
     }
   };
 
   transporter = nodemailer.createTransport(transportConfig);
+
 
 
 
