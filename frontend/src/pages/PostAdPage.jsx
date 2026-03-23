@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { PhotoIcon, XMarkIcon, MapPinIcon, ChevronRightIcon, ChevronLeftIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../context/AuthContext';
+import api from '../lib/api';
 
 export default function PostAdPage() {
   const { user } = useAuth();
@@ -19,7 +19,7 @@ export default function PostAdPage() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const { data } = await axios.get('/api/settings');
+        const { data } = await api.get('/settings');
         setSettings(data);
       } catch (err) {
         console.error('Error fetching settings:', err);
@@ -27,7 +27,7 @@ export default function PostAdPage() {
     };
     const fetchCities = async () => {
       try {
-        const { data } = await axios.get('/api/cities');
+        const { data } = await api.get('/cities');
         setCities(data);
       } catch (err) {
         console.error('Error fetching cities:', err);
@@ -55,7 +55,7 @@ export default function PostAdPage() {
   useEffect(() => {
     const fetchCats = async () => {
       try {
-        const { data } = await axios.get('/api/categories');
+        const { data } = await api.get('/categories');
         setCategories(data);
       } catch (err) {
         console.error('Error fetching categories:', err);
@@ -68,7 +68,7 @@ export default function PostAdPage() {
     const fetchSubs = async () => {
       if (formData.category) {
         try {
-          const { data } = await axios.get(`/api/subcategories?categoryId=${formData.category}`);
+          const { data } = await api.get(`/subcategories?categoryId=${formData.category}`);
           setSubcategories(data);
         } catch (err) {
           console.error('Error fetching subcategories:', err);
@@ -91,7 +91,7 @@ export default function PostAdPage() {
     try {
       setLoading(true);
       setError(null);
-      const { data } = await axios.post('/api/upload', uploadData, {
+      const { data } = await api.post('/upload', uploadData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setFormData(prev => ({ ...prev, images: [...prev.images, ...data.urls] }));
@@ -115,7 +115,7 @@ export default function PostAdPage() {
     try {
       setLoading(true);
       setError(null);
-      const { data } = await axios.post('/api/ads', formData);
+      const { data } = await api.post('/ads', formData);
       navigate(`/admin/ads`);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to post ad');
