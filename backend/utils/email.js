@@ -1,3 +1,4 @@
+import dns from 'dns';
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 import Settings from '../models/Settings.js';
@@ -8,27 +9,56 @@ let transporter = null;
 const initTransporter = async () => {
   const settings = await Settings.findOne();
   const emailSettings = settings?.emailSettings || {};
-  
+
   const smtpUser = emailSettings.smtpUser || process.env.EMAIL_USER;
   const smtpPass = emailSettings.smtpPass || process.env.EMAIL_PASS;
   const smtpHost = emailSettings.smtpHost || 'smtp.gmail.com';
-  const smtpPort = emailSettings.smtpPort || 465;
+  const smtpPort = emailSettings.smtpPort || 587;
+
+  console.log(`Configuring email transporter: Host=${smtpHost}, Port=${smtpPort}, User=${smtpUser ? '***' + smtpUser.slice(-4) : 'undefined'}`);
 
   if (!smtpUser || !smtpPass) {
-    console.error('Email credentials not configured');
+    console.error('Email credentials not configured: EMAIL_USER or EMAIL_PASS missing');
     return null;
   }
 
-  transporter = nodemailer.createTransport({
-  host: smtpHost,
-  port: smtpPort,
-  secure: smtpPort === 465,
-  family: 4, // 👈 yeh add karo
-  auth: {
-    user: smtpUser?.trim(),
-    pass: smtpPass?.trim(),
-  },
-});
+
+  const isGmail = smtpHost.includes('gmail.com');
+
+  const transportConfig = isGmail ? {
+    service: 'gmail',
+    auth: {
+      user: smtpUser?.trim(),
+      pass: smtpPass?.trim(),
+    },
+    family: 4, // Force IPv4
+    lookup: (hostname, options, callback) => {
+      return dns.lookup(hostname, { family: 4 }, callback);
+    },
+    tls: {
+      rejectUnauthorized: false,
+      minVersion: 'TLSv1.2'
+    }
+  } : {
+    host: smtpHost,
+    port: smtpPort,
+    secure: smtpPort === 465,
+    auth: {
+      user: smtpUser?.trim(),
+      pass: smtpPass?.trim(),
+    },
+    family: 4, // Force IPv4
+    lookup: (hostname, options, callback) => {
+      return dns.lookup(hostname, { family: 4 }, callback);
+    },
+    tls: {
+      rejectUnauthorized: false,
+      minVersion: 'TLSv1.2'
+    }
+  };
+
+  transporter = nodemailer.createTransport(transportConfig);
+
 
   transporter.verify((error, success) => {
     if (error) {
@@ -60,7 +90,7 @@ const sendEmail = async (to, subject, html) => {
       console.error('Email transporter not initialized');
       return false;
     }
-    
+
     const settings = await getSettings();
     const fromName = settings?.emailSettings?.fromName || 'OLX Marketplace';
     const fromEmail = settings?.emailSettings?.fromEmail || process.env.EMAIL_USER;
@@ -82,17 +112,17 @@ export const sendVerificationEmail = async (user) => {
   const settings = await getSettings();
   const templates = settings?.emailTemplates?.verification || {};
   const emailSettings = settings?.emailSettings || {};
-  
+
   const code = Math.floor(100000 + Math.random() * 900000).toString();
   const expiryMinutes = emailSettings.codeExpiryMinutes || 5;
-  
+
   user.verificationCode = code;
   user.verificationCodeExpires = new Date(Date.now() + expiryMinutes * 60 * 1000);
   await user.save();
 
   const subject = templates.subject || 'Verify your OLX account';
   const bodyTemplate = templates.body || '<div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto;"><h2 style="color: #3e6fe1;">Verify Your Email</h2><p>Your verification code is:</p><h1 style="background: #f3f4f6; padding: 16px; text-align: center; letter-spacing: 4px;">{CODE}</h1><p style="color: #6b7280; font-size: 14px;">This code expires in {EXPIRY} minutes.</p></div>';
-  
+
   const html = bodyTemplate.replace(/{CODE}/g, code).replace(/{EXPIRY}/g, expiryMinutes);
 
   return sendEmail(user.email, subject, html);
@@ -102,17 +132,17 @@ export const sendPasswordResetEmail = async (user) => {
   const settings = await getSettings();
   const templates = settings?.emailTemplates?.passwordReset || {};
   const emailSettings = settings?.emailSettings || {};
-  
+
   const code = Math.floor(100000 + Math.random() * 900000).toString();
   const expiryMinutes = emailSettings.codeExpiryMinutes || 5;
-  
+
   user.resetPasswordCode = code;
   user.resetPasswordExpires = new Date(Date.now() + expiryMinutes * 60 * 1000);
   await user.save();
 
   const subject = templates.subject || 'Reset your OLX password';
   const bodyTemplate = templates.body || '<div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto;"><h2 style="color: #3e6fe1;">Reset Your Password</h2><p>Your password reset code is:</p><h1 style="background: #f3f4f6; padding: 16px; text-align: center; letter-spacing: 4px;">{CODE}</h1><p style="color: #6b7280; font-size: 14px;">This code expires in {EXPIRY} minutes.</p></div>';
-  
+
   const html = bodyTemplate.replace(/{CODE}/g, code).replace(/{EXPIRY}/g, expiryMinutes);
 
   return sendEmail(user.email, subject, html);
@@ -121,10 +151,10 @@ export const sendPasswordResetEmail = async (user) => {
 export const sendPasswordChangeNotification = async (user) => {
   const settings = await getSettings();
   const templates = settings?.emailTemplates?.passwordChanged || {};
-  
+
   const subject = templates.subject || 'Your OLX password has been changed';
   const bodyTemplate = templates.body || '<div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto;"><h2 style="color: #3e6fe1;">Password Changed</h2><p>Your password has been successfully changed.</p><p style="color: #6b7280; font-size: 14px;">If you didn\'t change your password, please contact us immediately.</p></div>';
-  
+
   const html = bodyTemplate;
 
   return sendEmail(user.email, subject, html);
