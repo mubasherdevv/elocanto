@@ -37,8 +37,9 @@ const initTransporter = async () => {
 
   const transportConfig = {
     host: resolvedHost,
-    port: isGmail ? 465 : smtpPort,
-    secure: isGmail ? true : (smtpPort === 465),
+    port: isGmail ? 587 : smtpPort,
+    secure: isGmail ? false : (smtpPort === 465),
+
     auth: {
       user: smtpUser?.trim(),
       pass: smtpPass?.trim(),
