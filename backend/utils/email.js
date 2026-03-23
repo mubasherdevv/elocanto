@@ -1,10 +1,7 @@
-import * as SibApiV3Sdk from '@getbrevo/brevo';
+import { BrevoClient } from '@getbrevo/brevo';
 import dotenv from 'dotenv';
 import Settings from '../models/Settings.js';
 dotenv.config();
-
-// Create API instance
-const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
 const getSettings = async () => {
   return await Settings.findOne();
@@ -18,28 +15,30 @@ const sendEmail = async (to, subject, html) => {
       return false;
     }
 
-    // Configure API key
-    apiInstance.setApiKey(SibApiV3Sdk.TransactionalEmailsApiApiKeys.apiKey, apiKey);
+    // Initialize Brevo Client
+    const client = new BrevoClient({
+      apiKey: apiKey,
+    });
 
     const settings = await getSettings();
     const fromName = settings?.emailSettings?.fromName || 'OLX Marketplace';
-    // For Brevo, if you don't have a verified domain, you can use any email 
-    // but it's better to use one that matches your settings or a placeholder
     const fromEmail = settings?.emailSettings?.fromEmail || 'noreply@olx-marketplace.com';
 
-    const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
-    sendSmtpEmail.subject = subject;
-    sendSmtpEmail.htmlContent = html;
-    sendSmtpEmail.sender = { name: fromName, email: fromEmail };
-    sendSmtpEmail.to = [{ email: to }];
+    const response = await client.transactionalEmails.sendTransacEmail({
+      subject: subject,
+      htmlContent: html,
+      sender: { name: fromName, email: fromEmail },
+      to: [{ email: to }],
+    });
 
-    const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
-    console.log(`Email sent successfully to ${to}. Message ID: ${data.body.messageId}`);
+    console.log(`Email sent successfully to ${to}. Message ID: ${response.messageId || 'sent'}`);
     return true;
   } catch (error) {
-    // Brevo errors are often in error.response.body
-    const errorMsg = error.response?.body?.message || error.message;
-    console.error('Brevo API error:', errorMsg);
+    // Detailed error logging for Brevo v5
+    console.error('Brevo API error:', error.message || error);
+    if (error.body) {
+      console.error('Error details:', JSON.stringify(error.body, null, 2));
+    }
     return false;
   }
 };
