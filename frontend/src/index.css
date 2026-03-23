@@ -232,6 +232,16 @@ textarea.input-field { resize: vertical; min-height: 120px; }
 .text-danger { color: var(--danger); }
 .flex-center { display: flex; align-items: center; justify-content: center; }
 
+.hide-scroll::-webkit-scrollbar,
+.no-scrollbar::-webkit-scrollbar { 
+  display: none; 
+}
+.hide-scroll,
+.no-scrollbar { 
+  -ms-overflow-style: none; 
+  scrollbar-width: none; 
+}
+
 /* ─── Glassmorphism ──────────────────────────── */
 .glass {
   background: rgba(255,255,255,0.85);
