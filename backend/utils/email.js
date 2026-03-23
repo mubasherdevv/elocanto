@@ -24,25 +24,11 @@ const initTransporter = async () => {
 
 
   const isGmail = smtpHost.includes('gmail.com');
-
-  const transportConfig = isGmail ? {
-    service: 'gmail',
-    auth: {
-      user: smtpUser?.trim(),
-      pass: smtpPass?.trim(),
-    },
-    family: 4, // Force IPv4
-    lookup: (hostname, options, callback) => {
-      return dns.lookup(hostname, { family: 4 }, callback);
-    },
-    tls: {
-      rejectUnauthorized: false,
-      minVersion: 'TLSv1.2'
-    }
-  } : {
-    host: smtpHost,
-    port: smtpPort,
-    secure: smtpPort === 465,
+  
+  const transportConfig = {
+    host: isGmail ? 'smtp.gmail.com' : smtpHost,
+    port: isGmail ? 465 : smtpPort,
+    secure: isGmail ? true : (smtpPort === 465),
     auth: {
       user: smtpUser?.trim(),
       pass: smtpPass?.trim(),
@@ -58,6 +44,7 @@ const initTransporter = async () => {
   };
 
   transporter = nodemailer.createTransport(transportConfig);
+
 
 
   transporter.verify((error, success) => {
