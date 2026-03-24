@@ -33,3 +33,38 @@ export const getResizedImage = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+export const getProxyImage = async (req, res) => {
+  try {
+    const { url } = req.query;
+    const { w } = req.query;
+    const width = parseInt(w) || null;
+
+    if (!url) {
+      return res.status(400).json({ message: 'URL is required' });
+    }
+
+    const response = await fetch(url);
+    if (!response.ok) {
+      return res.status(response.status).json({ message: 'Failed to fetch image from external source' });
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    let transform = sharp(buffer);
+
+    if (width) {
+      transform = transform.resize({ width, withoutEnlargement: true });
+    }
+
+    transform = transform.webp({ quality: 75 });
+
+    res.set('Content-Type', 'image/webp');
+    res.set('Cache-Control', 'public, max-age=2592000, immutable'); // 30 days cache
+
+    transform.pipe(res);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

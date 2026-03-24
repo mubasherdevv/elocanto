@@ -34,11 +34,16 @@ export default function AdCard({ ad, initialFav = false, onFavToggle }) {
 
   const imageUrl = isLocalUpload
     ? `/api/images/${filename}?w=400`
-    : (ad.images?.[0]?.startsWith('http') ? ad.images[0] : (ad.images?.[0] ? `http://localhost:5000${ad.images[0]}` : `https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&auto=format&fit=crop`));
+    : (ad.images?.[0]?.startsWith('http') 
+        ? (ad.images[0].includes('images.unsplash.com') ? ad.images[0] : `/api/images/proxy?url=${encodeURIComponent(ad.images[0])}&w=400`)
+        : (ad.images?.[0] ? `http://localhost:5000${ad.images[0]}` : `https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&auto=format&fit=crop`));
 
   const srcSet = isLocalUpload
     ? `/api/images/${filename}?w=200 200w, /api/images/${filename}?w=400 400w, /api/images/${filename}?w=600 600w`
-    : undefined;
+    : (ad.images?.[0]?.startsWith('http') && !ad.images[0].includes('images.unsplash.com')
+        ? `/api/images/proxy?url=${encodeURIComponent(ad.images[0])}&w=200 200w, /api/images/proxy?url=${encodeURIComponent(ad.images[0])}&w=400 400w, /api/images/proxy?url=${encodeURIComponent(ad.images[0])}&w=600 600w`
+        : undefined);
+
 
   const handleFav = async (e) => {
     e.preventDefault();
