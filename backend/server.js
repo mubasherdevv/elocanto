@@ -32,12 +32,31 @@ const PORT = process.env.PORT || 5000;
 app.use(
   helmet({
     contentSecurityPolicy: {
+      useDefaults: true,
       directives: {
         ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-        "script-src": ["'self'", "'unsafe-inline'", "https://accounts.google.com/gsi/client"],
+        "script-src": [
+          "'self'",
+          "'unsafe-inline'",
+          "'unsafe-eval'",
+          "data:",
+          "https://accounts.google.com",
+          "https://*.google.com"
+        ],
+        "script-src-elem": [
+          "'self'",
+          "'unsafe-inline'",
+          "data:",
+          "https://accounts.google.com",
+          "https://*.google.com"
+        ],
+        "script-src-attr": ["'unsafe-inline'"],
         "frame-src": ["'self'", "https://accounts.google.com"],
-        "connect-src": ["'self'", "https://accounts.google.com"],
+        "connect-src": ["'self'", "data:", "blob:", "https://accounts.google.com", "https://*.google.com"],
         "img-src": ["'self'", "data:", "blob:", "https:", "http:"],
+        "font-src": ["'self'", "data:", "https://fonts.gstatic.com"],
+        "style-src": ["'self'", "'unsafe-inline'", "data:", "https://fonts.googleapis.com"],
+        "worker-src": ["'self'", "blob:"],
       },
     },
     crossOriginResourcePolicy: { policy: "cross-origin" }
