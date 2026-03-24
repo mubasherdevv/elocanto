@@ -21,6 +21,7 @@ import cityRoutes from './routes/cityRoutes.js';
 import seoContentRoutes from './routes/seoContentRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
 import viewRoutes from './routes/viewRoutes.js';
+import imageRoutes from './routes/imageRoutes.js';
 
 connectDB();
 
@@ -63,6 +64,7 @@ app.use('/api/cities', cityRoutes);
 app.use('/api/seo', seoContentRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/views', viewRoutes);
+app.use('/api/images', imageRoutes);
 
 // Serve frontend in production
 if (process.env.NODE_ENV === 'production') {

@@ -29,9 +29,16 @@ export default function AdCard({ ad, initialFav = false, onFavToggle }) {
   const [favorited, setFavorited] = useState(initialFav);
   const [favLoading, setFavLoading] = useState(false);
 
-  const image = ad.images?.[0]
-    ? (ad.images[0].startsWith('http') ? ad.images[0] : `http://localhost:5000${ad.images[0]}`)
-    : `https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&auto=format&fit=crop`;
+  const isLocalUpload = ad.images?.[0]?.startsWith('/uploads/');
+  const filename = isLocalUpload ? ad.images[0].split('/').pop() : null;
+
+  const imageUrl = isLocalUpload
+    ? `/api/images/${filename}?w=400`
+    : (ad.images?.[0]?.startsWith('http') ? ad.images[0] : (ad.images?.[0] ? `http://localhost:5000${ad.images[0]}` : `https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&auto=format&fit=crop`));
+
+  const srcSet = isLocalUpload
+    ? `/api/images/${filename}?w=200 200w, /api/images/${filename}?w=400 400w, /api/images/${filename}?w=600 600w`
+    : undefined;
 
   const handleFav = async (e) => {
     e.preventDefault();
@@ -58,7 +65,9 @@ export default function AdCard({ ad, initialFav = false, onFavToggle }) {
       {/* Square Image Container */}
       <div className="relative aspect-square bg-white flex items-center justify-center overflow-hidden flex-shrink-0">
         <img
-          src={image}
+          src={imageUrl}
+          srcSet={srcSet}
+          sizes="(max-width: 640px) 200px, 400px"
           alt={ad.title}
           width="400"
           height="400"
@@ -100,11 +109,11 @@ export default function AdCard({ ad, initialFav = false, onFavToggle }) {
           )}
         </div>
 
-        <h3 className="text-gray-500 text-sm font-medium leading-relaxed line-clamp-2 mb-2 h-10">
+        <h3 className="text-gray-600 text-sm font-semibold leading-relaxed line-clamp-2 mb-2 h-10">
           {ad.title}
         </h3>
 
-        <div className="flex items-center gap-3 text-gray-400 mb-4">
+        <div className="flex items-center gap-3 text-gray-500 mb-4">
           <div className="flex items-center gap-1 min-w-0">
             <MapPinIcon className="w-3.5 h-3.5 flex-shrink-0" />
             <span className="text-[10px] font-bold truncate">{ad.city}</span>

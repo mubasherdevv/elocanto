@@ -192,7 +192,7 @@ export default function AdminUsersPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[#1e293b] tracking-tight">User Management</h1>
-          <p className="text-gray-400 text-sm font-medium mt-0.5">Manage all registered users</p>
+          <p className="text-gray-500 text-sm font-medium mt-0.5">Manage all registered users</p>
         </div>
         
         <div className="flex items-center gap-3">
@@ -244,7 +244,7 @@ export default function AdminUsersPage() {
                 </div>
                 <div>
                   <p className="text-2xl font-black text-[#1e293b]">{stat.value.toLocaleString()}</p>
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-0.5">{stat.label}</p>
+                  <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mt-0.5">{stat.label}</p>
                 </div>
               </div>
             ))}
@@ -304,14 +304,14 @@ export default function AdminUsersPage() {
               <table className="w-full text-left">
                 <thead>
                   <tr className="bg-gray-50/30 border-b border-gray-100">
-                    <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">User</th>
-                    <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Contact</th>
-                    <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">City</th>
-                    <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Ads</th>
-                    <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Joined</th>
-                    <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Badges</th>
-                    <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Status</th>
-                    <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Actions</th>
+                    <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-widest">User</th>
+                    <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-widest">Contact</th>
+                    <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-widest">City</th>
+                    <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-widest text-center">Ads</th>
+                    <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-widest">Joined</th>
+                    <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-widest">Badges</th>
+                    <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-widest">Status</th>
+                    <th className="px-6 py-4 text-[10px] font-black text-gray-500 uppercase tracking-widest text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
@@ -680,7 +680,7 @@ export default function AdminUsersPage() {
                           <div className="flex flex-col items-end gap-2 text-[10px] font-black text-gray-400">
                              #{ad._id.slice(-6).toUpperCase()}
                              <div className="flex gap-2">
-                               <button className="p-2 hover:bg-gray-50 rounded-xl text-gray-300 hover:text-[#f95e26] transition-all"><EyeIcon className="w-4 h-4" /></button>
+                               <button aria-label="View listing details" className="p-2 hover:bg-gray-50 rounded-xl text-gray-300 hover:text-[#f95e26] transition-all"><EyeIcon className="w-4 h-4" /></button>
                              </div>
                           </div>
                         </div>

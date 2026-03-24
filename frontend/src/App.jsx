@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import PublicLayout from './components/PublicLayout';
 import AdminLayout from './components/AdminLayout';
 import PrivateRoute from './components/PrivateRoute';
