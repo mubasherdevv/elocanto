@@ -92,7 +92,7 @@ export default function UserProfile() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-8 items-center">
           <div className="relative group">
             {profileUser.profilePhoto ? (
-              <img src={profileUser.profilePhoto} className="w-28 h-28 md:w-32 md:h-32 rounded-full object-cover border-4 border-[#2d3a4d]" alt={profileUser.name} />
+              <img src={profileUser.profilePhoto} width="128" height="128" loading="lazy" className="w-28 h-28 md:w-32 md:h-32 rounded-full object-cover border-4 border-[#2d3a4d]" alt={profileUser.name} />
             ) : (
               <div className="w-28 h-28 md:w-32 md:h-32 rounded-full bg-orange-500 flex items-center justify-center text-4xl font-bold text-white border-4 border-[#2d3a4d]">
                 {profileUser.name?.charAt(0) || 'U'}
@@ -141,15 +141,15 @@ export default function UserProfile() {
         <div className="bg-white rounded-3xl -mt-8 shadow-xl border border-gray-100 p-8 grid grid-cols-3 divide-x divide-gray-100 relative z-10 transition-transform hover:scale-[1.01] duration-300">
           <div className="text-center px-4">
             <div className="text-3xl font-black text-gray-800 tracking-tight">{ads.length}</div>
-            <div className="text-xs font-bold text-gray-400 uppercase mt-1">Total Ads</div>
+            <div className="text-xs font-bold text-gray-500 uppercase mt-1">Total Ads</div>
           </div>
           <div className="text-center px-4">
             <div className="text-3xl font-black text-gray-800 tracking-tight">{ads.reduce((acc, ad) => acc + (ad.views || 0), 0)}</div>
-            <div className="text-xs font-bold text-gray-400 uppercase mt-1">Total Views</div>
+            <div className="text-xs font-bold text-gray-500 uppercase mt-1">Total Views</div>
           </div>
           <div className="text-center px-4">
             <div className="text-3xl font-black text-gray-800 tracking-tight">Level 1</div>
-            <div className="text-xs font-bold text-gray-400 uppercase mt-1">Badge</div>
+            <div className="text-xs font-bold text-gray-500 uppercase mt-1">Badge</div>
           </div>
         </div>
 
@@ -198,7 +198,7 @@ export default function UserProfile() {
                 <div className="flex items-start gap-4">
                   <div className="p-3 bg-gray-50 rounded-2xl"><PhoneIcon className="w-5 h-5 text-gray-400" /></div>
                   <div>
-                    <div className="text-xs font-bold text-gray-400 uppercase">Phone Number</div>
+                    <div className="text-xs font-bold text-gray-500 uppercase">Phone Number</div>
                     <div className="text-sm font-bold text-gray-800 mt-1">
                       {isOwnProfile || phoneVisible ? (
                         profileUser.phone || 'N/A'
@@ -212,7 +212,7 @@ export default function UserProfile() {
                 <div className="flex items-start gap-4">
                   <div className="p-3 bg-gray-50 rounded-2xl"><EnvelopeIcon className="w-5 h-5 text-gray-400" /></div>
                   <div>
-                    <div className="text-xs font-bold text-gray-400 uppercase">Email</div>
+                    <div className="text-xs font-bold text-gray-500 uppercase">Email</div>
                     <div className="text-sm font-bold text-gray-800 mt-1 truncate max-w-[180px]">{profileUser.email}</div>
                   </div>
                 </div>
@@ -246,8 +246,9 @@ export default function UserProfile() {
             <form onSubmit={handleSaveProfile} className="p-8 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Full Name</label>
+                  <label htmlFor="edit-name" className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Full Name</label>
                   <input 
+                    id="edit-name"
                     type="text" 
                     className="w-full px-5 py-3 rounded-2xl border-2 border-gray-100 focus:border-orange-500 outline-none font-semibold"
                     value={formData.name}
@@ -255,8 +256,9 @@ export default function UserProfile() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Phone Number</label>
+                  <label htmlFor="edit-phone" className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Phone Number</label>
                   <input 
+                    id="edit-phone"
                     type="text" 
                     className="w-full px-5 py-3 rounded-2xl border-2 border-gray-100 focus:border-orange-500 outline-none font-semibold"
                     value={formData.phone}
@@ -266,8 +268,9 @@ export default function UserProfile() {
               </div>
 
               <div>
-                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">City</label>
+                <label htmlFor="edit-city" className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">City</label>
                 <select 
+                  id="edit-city"
                   className="w-full px-5 py-3 rounded-2xl border-2 border-gray-100 focus:border-orange-500 outline-none font-semibold"
                   value={formData.city}
                   onChange={(e) => setFormData({...formData, city: e.target.value})}
@@ -280,8 +283,9 @@ export default function UserProfile() {
               </div>
 
               <div>
-                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Bio</label>
+                <label htmlFor="edit-bio" className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Bio</label>
                 <textarea 
+                  id="edit-bio"
                   className="w-full px-5 py-3 rounded-2xl border-2 border-gray-100 focus:border-orange-500 outline-none font-semibold h-28 resize-none"
                   value={formData.bio}
                   onChange={(e) => setFormData({...formData, bio: e.target.value})}

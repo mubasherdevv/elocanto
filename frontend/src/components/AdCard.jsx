@@ -60,6 +60,9 @@ export default function AdCard({ ad, initialFav = false, onFavToggle }) {
         <img
           src={image}
           alt={ad.title}
+          width="400"
+          height="400"
+          loading="lazy"
           className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110 p-4"
           onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400'; }}
         />
@@ -68,6 +71,7 @@ export default function AdCard({ ad, initialFav = false, onFavToggle }) {
         <button
           onClick={handleFav}
           disabled={favLoading}
+          aria-label={favorited ? "Remove from favorites" : "Add to favorites"}
           className="absolute top-3 right-3 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-sm hover:bg-white transition-colors z-10"
         >
           {favorited

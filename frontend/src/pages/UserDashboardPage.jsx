@@ -141,7 +141,7 @@ export default function UserDashboardPage() {
           {/* Profile Card - Hidden on mobile to save space, or simplified */}
           <div className="hidden lg:block bg-white rounded-2xl p-6 border border-gray-100 text-center mb-4">
             {user.profilePhoto ? (
-              <img src={user.profilePhoto} className="w-20 h-20 rounded-full object-cover mx-auto mb-3 shadow-sm" />
+              <img src={user.profilePhoto} width="80" height="80" loading="lazy" className="w-20 h-20 rounded-full object-cover mx-auto mb-3 shadow-sm" />
             ) : (
               <div className="w-20 h-20 rounded-full bg-orange-500 text-white flex items-center justify-center text-3xl font-black mx-auto mb-3">
                 {user.name[0]}
@@ -186,7 +186,7 @@ export default function UserDashboardPage() {
           {activeTab === 'ads' && (
             <div className="fade-in">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-                <h2 className="text-2xl font-black text-gray-900 tracking-tight">Account Overview</h2>
+                <h1 className="text-2xl font-black text-gray-900 tracking-tight">Account Overview</h1>
                 <Link to="/post-ad" className="btn-primary w-full sm:w-auto justify-center rounded-xl py-3 px-6 font-black tracking-tight">+ Post New Ad</Link>
               </div>
 
@@ -228,6 +228,7 @@ export default function UserDashboardPage() {
                         <div className="sm:w-48 h-40 sm:h-32 rounded-2xl overflow-hidden flex-shrink-0 bg-gray-50 relative">
                           <img 
                             src={ad.images?.[0] ? (ad.images[0].startsWith('http') ? ad.images[0] : `http://localhost:5000${ad.images[0]}`) : 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400'} 
+                            width="192" height="128" loading="lazy"
                             className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500" 
                           />
                         </div>
@@ -251,15 +252,15 @@ export default function UserDashboardPage() {
                         </div>
 
                         <div className="flex flex-row sm:flex-col justify-end gap-2 border-t sm:border-t-0 sm:border-l border-gray-50 pt-4 sm:pt-0 sm:pl-6">
-                          <Link to={`/ads/${generateAdSlug(ad)}`} className="flex-1 sm:flex-initial p-3 bg-gray-50 hover:bg-blue-50 text-blue-600 rounded-xl transition-colors flex items-center justify-center" title="View">
+                          <Link to={`/ads/${generateAdSlug(ad)}`} className="flex-1 sm:flex-initial p-3 bg-gray-50 hover:bg-blue-50 text-blue-600 rounded-xl transition-colors flex items-center justify-center" title="View" aria-label="View ad">
                              <EyeIcon className="w-5 h-5" />
                           </Link>
                           {ad.expiresAt && new Date(ad.expiresAt) < new Date() && (
-                            <button onClick={() => handleRenewAd(ad)} className="flex-1 sm:flex-initial p-3 bg-yellow-50 hover:bg-yellow-100 text-yellow-600 rounded-xl transition-colors flex items-center justify-center" title="Renew">
+                            <button onClick={() => handleRenewAd(ad)} className="flex-1 sm:flex-initial p-3 bg-yellow-50 hover:bg-yellow-100 text-yellow-600 rounded-xl transition-colors flex items-center justify-center" title="Renew" aria-label="Renew ad">
                               <ArrowTopRightOnSquareIcon className="w-5 h-5" />
                             </button>
                           )}
-                          <button onClick={() => handleDeleteAd(ad._id)} className="flex-1 sm:flex-initial p-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl transition-colors flex items-center justify-center" title="Delete">
+                          <button onClick={() => handleDeleteAd(ad._id)} className="flex-1 sm:flex-initial p-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl transition-colors flex items-center justify-center" title="Delete" aria-label="Delete ad">
                             <TrashIcon className="w-5 h-5" />
                           </button>
                         </div>
@@ -313,37 +314,37 @@ export default function UserDashboardPage() {
               <form onSubmit={handleUpdate} className="space-y-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div>
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">Full Name</label>
-                    <input type="text" className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-5 py-4 font-bold text-gray-900 focus:border-orange-500 transition-colors outline-none" value={profileData.name} onChange={e => setProfileData({...profileData, name: e.target.value})} />
+                    <label htmlFor="dash-name" className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">Full Name</label>
+                    <input id="dash-name" type="text" className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-5 py-4 font-bold text-gray-900 focus:border-orange-500 transition-colors outline-none" value={profileData.name} onChange={e => setProfileData({...profileData, name: e.target.value})} />
                   </div>
                   <div>
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">Phone Number</label>
-                    <input type="text" className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-5 py-4 font-bold text-gray-900 focus:border-orange-500 transition-colors outline-none" value={profileData.phone} onChange={e => setProfileData({...profileData, phone: e.target.value})} />
+                    <label htmlFor="dash-phone" className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">Phone Number</label>
+                    <input id="dash-phone" type="text" className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-5 py-4 font-bold text-gray-900 focus:border-orange-500 transition-colors outline-none" value={profileData.phone} onChange={e => setProfileData({...profileData, phone: e.target.value})} />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div>
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">Email Address</label>
-                    <input type="email" className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-5 py-4 font-bold text-gray-400 focus:border-orange-500 transition-colors outline-none opacity-60 cursor-not-allowed" value={profileData.email} disabled />
+                    <label htmlFor="dash-email" className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">Email Address</label>
+                    <input id="dash-email" type="email" className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-5 py-4 font-bold text-gray-400 focus:border-orange-500 transition-colors outline-none opacity-60 cursor-not-allowed" value={profileData.email} disabled />
                   </div>
                   <div>
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">New Password</label>
-                    <input type="password" className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-5 py-4 font-bold text-gray-900 focus:border-orange-500 transition-colors outline-none" value={profileData.password} onChange={e => setProfileData({...profileData, password: e.target.value})} placeholder="••••••••" />
+                    <label htmlFor="dash-password" className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">New Password</label>
+                    <input id="dash-password" type="password" className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-5 py-4 font-bold text-gray-900 focus:border-orange-500 transition-colors outline-none" value={profileData.password} onChange={e => setProfileData({...profileData, password: e.target.value})} placeholder="••••••••" />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">City</label>
-                  <select className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-5 py-4 font-bold text-gray-900 focus:border-orange-500 transition-colors outline-none cursor-pointer" value={profileData.city} onChange={e => setProfileData({...profileData, city: e.target.value})}>
+                  <label htmlFor="dash-city" className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">City</label>
+                  <select id="dash-city" className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-5 py-4 font-bold text-gray-900 focus:border-orange-500 transition-colors outline-none cursor-pointer" value={profileData.city} onChange={e => setProfileData({...profileData, city: e.target.value})}>
                     <option value="">Select City</option>
                     {['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Peshawar', 'Quetta', 'Multan', 'Faisalabad'].map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">Bio (Optional)</label>
-                  <textarea className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-5 py-4 font-bold text-gray-900 focus:border-orange-500 transition-colors outline-none min-h-[120px]" value={profileData.bio} onChange={e => setProfileData({...profileData, bio: e.target.value})} placeholder="Tell us something about yourself..."></textarea>
+                  <label htmlFor="dash-bio" className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 block">Bio (Optional)</label>
+                  <textarea id="dash-bio" className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-5 py-4 font-bold text-gray-900 focus:border-orange-500 transition-colors outline-none min-h-[120px]" value={profileData.bio} onChange={e => setProfileData({...profileData, bio: e.target.value})} placeholder="Tell us something about yourself..."></textarea>
                 </div>
 
                 <button type="submit" className="btn-primary w-full sm:w-auto py-4 px-12 rounded-2xl font-black text-lg shadow-xl shadow-orange-200">Save Profile</button>

@@ -3,7 +3,7 @@ import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { useAds } from '../context/AdContext';
 import AdCard from '../components/AdCard';
 import api from '../lib/api';
-import { FunnelIcon, ArrowsUpDownIcon, XMarkIcon, ShieldCheckIcon, AdjustmentsHorizontalIcon, ChevronDownIcon, EyeIcon } from '@heroicons/react/24/outline';
+import { FunnelIcon, ArrowsUpDownIcon, XMarkIcon, ShieldCheckIcon, AdjustmentsHorizontalIcon, ChevronDownIcon, EyeIcon, MapPinIcon, MapIcon } from '@heroicons/react/24/outline';
 import { generateAdSlug } from '../utils/urlUtils';
 
 export default function AdsListingPage() {
@@ -235,6 +235,7 @@ export default function AdsListingPage() {
               <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center' }}>
                 <select 
                   value={sort} onChange={(e) => updateFilter('sort', e.target.value)}
+                  aria-label="Sort by"
                   style={{ 
                     width: '100%', appearance: 'none', background: 'white', border: '1px solid #e2e8f0', 
                     padding: '12px 16px', paddingRight: 40, borderRadius: 12, fontSize: 14, 
@@ -273,7 +274,7 @@ export default function AdsListingPage() {
               {featuredAds.slice(0, settings?.featuredAdsLimit || 10).map(ad => (
                 <Link key={ad._id} to={`/ads/${generateAdSlug(ad)}`} style={{ textDecoration: 'none', textAlign: 'center', flexShrink: 0, width: 130, scrollSnapAlign: 'start' }}>
                   <div style={{ width: 130, height: 130, borderRadius: '50%', background: 'white', border: '4px solid white', boxShadow: '0 10px 20px rgba(0,0,0,0.06)', marginBottom: 12, overflow: 'hidden', transition: 'all 0.3s' }} className="hover:scale-105 hover:shadow-lg group">
-                    <img src={ad.images[0] ? (ad.images[0].startsWith('http') ? ad.images[0] : `http://localhost:5000${ad.images[0]}`) : 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400'} alt={ad.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} className="transition-transform group-hover:scale-110" />
+                    <img src={ad.images[0] ? (ad.images[0].startsWith('http') ? ad.images[0] : `http://localhost:5000${ad.images[0]}`) : 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400'} alt={ad.title} width="130" height="130" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} className="transition-transform group-hover:scale-110" />
                   </div>
                   <div style={{ color: '#854d0e', fontSize: 15, fontWeight: 900, marginBottom: 2 }}>{settings?.priceFormat || 'PKR'} {ad.price.toLocaleString()}</div>
                   <div style={{ color: '#a16207', fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: '0 4px' }}>{ad.title}</div>
@@ -291,7 +292,7 @@ export default function AdsListingPage() {
         <aside className={`filter-sidebar ${isLarge || showFilters ? 'block' : 'hidden'} ${showFilters && !isLarge ? 'mobile-active' : ''}`} style={{ background: 'transparent', border: 'none', padding: 0 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }} className="sm:hidden">
             <h3 style={{ fontWeight: 800 }}>Filters</h3>
-            <button onClick={() => setShowFilters(false)} className="btn-ghost" style={{ padding: 4 }}><XMarkIcon style={{ width: 24, height: 24 }} /></button>
+            <button onClick={() => setShowFilters(false)} aria-label="Close filters" className="btn-ghost" style={{ padding: 4 }}><XMarkIcon style={{ width: 24, height: 24 }} /></button>
           </div>
 
           {!isLarge && (
@@ -311,6 +312,7 @@ export default function AdsListingPage() {
                 <input 
                   type="number" 
                   placeholder="Min" 
+                  aria-label="Minimum price"
                   className="input-field" 
                   style={{ padding: '10px 14px', fontSize: 13, borderRadius: 12, border: '2px solid var(--gray-200)' }} 
                   value={tempFilters.priceMin} 
@@ -321,6 +323,7 @@ export default function AdsListingPage() {
                 <input 
                   type="number" 
                   placeholder="Max" 
+                  aria-label="Maximum price"
                   className="input-field" 
                   style={{ padding: '10px 14px', fontSize: 13, borderRadius: 12, border: '2px solid var(--gray-200)' }} 
                   value={tempFilters.priceMax} 
@@ -534,7 +537,7 @@ export default function AdsListingPage() {
                   {ads.map(ad => (
                     <Link key={ad._id} to={`/ads/${generateAdSlug(ad)}`} style={{ textDecoration: 'none', background: 'linear-gradient(to bottom, #fffcf0, #ffffff)', border: '2px solid #fde047', borderRadius: 16, overflow: 'hidden', boxShadow: '0 8px 24px rgba(250, 204, 21, 0.15)', display: 'flex', flexDirection: 'column', transition: 'transform 0.2s', position: 'relative', height: '100%' }} className="hover:scale-105">
                       <div style={{ height: 160, position: 'relative' }}>
-                        <img src={ad.images[0] ? (ad.images[0].startsWith('http') ? ad.images[0] : `http://localhost:5000${ad.images[0]}`) : 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400'} alt={ad.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <img src={ad.images[0] ? (ad.images[0].startsWith('http') ? ad.images[0] : `http://localhost:5000${ad.images[0]}`) : 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400'} alt={ad.title} width="300" height="160" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         <span style={{ position: 'absolute', top: 12, left: 12, display: 'inline-flex', alignItems: 'center', gap: 4, background: '#facc15', color: '#854d0e', fontSize: 10, fontWeight: 800, padding: '4px 8px', borderRadius: 4, textTransform: 'uppercase', letterSpacing: 0.5 }}>⭐ Featured</span>
                       </div>
                       <div style={{ padding: 16, display: 'flex', flexDirection: 'column', flex: 1 }}>
@@ -591,7 +594,7 @@ export default function AdsListingPage() {
                       <button 
                         key={i} onClick={() => updateFilter('page', i+1)}
                         style={{
-                          width: 36, height: 36, borderRadius: 8, border: 'none',
+                          width: 36, height: 36, borderRadius: 8,
                           background: currentPage === i + 1 ? 'var(--primary)' : 'white',
                           color: currentPage === i + 1 ? 'white' : 'var(--dark)',
                           fontWeight: 700, cursor: 'pointer', border: currentPage === i + 1 ? 'none' : '1px solid var(--gray-200)'

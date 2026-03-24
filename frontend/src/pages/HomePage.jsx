@@ -168,7 +168,7 @@ export default function HomePage() {
               <Link to={`/ads?category=${cat.slug}`} className="category-card">
                 <div className="category-blob">
                   {cat.image ? (
-                    <img src={cat.image} alt={cat.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img src={cat.image} alt={cat.name} width="120" height="120" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : <span style={{ fontSize: '2.5rem' }}>{cat.icon || '📦'}</span>}
                 </div>
                 <span style={{ fontWeight: 700, fontSize: 13, color: 'var(--gray-800)' }}>{cat.name}</span>
@@ -188,7 +188,7 @@ export default function HomePage() {
                 <Link to={`/ads?city=${encodeURIComponent(city.name)}`} style={{ textDecoration: 'none', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
                   <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'linear-gradient(145deg, #ffffff, #f1f5f9)', boxShadow: '6px 6px 12px #e2e8f0, -6px -6px 12px #ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', border: city.isPopular ? '2px solid var(--primary)' : '2px solid transparent', transition: 'transform 0.2s' }} className="hover:scale-105">
                     {city.image ? (
-                      <img src={city.image} alt={city.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <img src={city.image} alt={city.name} width="80" height="80" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : <span style={{ fontSize: '1.5rem' }}>{city.isPopular ? '🌟' : '📍'}</span>}
                   </div>
                   <span style={{ fontWeight: 700, fontSize: 13, color: 'var(--gray-800)' }}>{city.name}</span>
