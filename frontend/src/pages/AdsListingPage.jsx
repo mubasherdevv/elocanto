@@ -375,7 +375,7 @@ export default function AdsListingPage() {
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       <div style={{ width: 24, height: 24, borderRadius: '50%', overflow: 'hidden', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
-                        <img src={cat.image || 'https://via.placeholder.com/20'} alt={cat.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <img src={cat.image || 'https://via.placeholder.com/20'} alt={cat.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
                       </div>
                       <span>{cat.name}</span>
                     </div>

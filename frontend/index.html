@@ -1,49 +1,54 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OLX.pk | Classified Marketplace in Pakistan</title>
-    <meta name="description" content="Pakistan's largest classified marketplace. Buy and sell cars, mobiles, property, electronics and much more in your city." />
-    <meta name="theme-color" content="#3e6fe1" />
-    
-    <!-- Open Graph / Meta Tags -->
-    <meta property="og:title" content="OLX.pk | Classified Marketplace in Pakistan" />
-    <meta property="og:description" content="Pakistan's largest classified marketplace. Buy and sell cars, mobiles, property, electronics and much more in your city." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://olx.pk/" />
-    <meta property="og:image" content="https://olx.pk/og-image.jpg" />
-    
-    <!-- Twitter Cards -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="OLX.pk | Classified Marketplace in Pakistan" />
-    <meta name="twitter:description" content="Pakistan's largest classified marketplace. Buy and sell cars, mobiles, property, electronics and much more in your city." />
-    <meta name="twitter:image" content="https://olx.pk/og-image.jpg" />
-    
-    <!-- Canonical URL -->
-    <link rel="canonical" href="https://olx.pk/" />
-    
-    <!-- Preconnect for Fonts and Tags -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://www.googletagmanager.com">
-    
-    <!-- Structured Data (JSON-LD) -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "OLX.pk",
-      "url": "https://olx.pk",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://olx.pk/ads?keyword={search_term_string}",
-        "query-input": "required name=search_term_string"
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OLX.pk | Classified Marketplace in Pakistan</title>
+  <meta name="description" content="Pakistan's largest classified marketplace. Buy and sell cars, mobiles, property, electronics and much more in your city." />
+  <meta name="theme-color" content="#3e6fe1" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <link rel="canonical" href="https://olx.pk/" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="OLX.pk | Classified Marketplace in Pakistan" />
+  <meta property="og:description" content="Pakistan's largest classified marketplace." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://olx.pk/" />
+  <meta property="og:image" content="https://olx.pk/og-image.jpg" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="OLX.pk | Classified Marketplace in Pakistan" />
+  <meta name="twitter:description" content="Pakistan's largest classified marketplace." />
+  <meta name="twitter:image" content="https://olx.pk/og-image.jpg" />
+
+  <!-- Preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <!-- Google Fonts ASYNC — non blocking -->
+  <link rel="stylesheet" 
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" 
+    media="print" onload="this.media='all'" />
+  <noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" />
+  </noscript>
+
+  <!-- JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "OLX.pk",
+    "url": "https://olx.pk",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://olx.pk/ads?keyword={search_term_string}",
+      "query-input": "required name=search_term_string"
     }
-    </script>
-  </head>
+  }
+  </script>
+</head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
