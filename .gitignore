@@ -29,5 +29,8 @@ Thumbs.db
 # Vite cache
 frontend/.vite/
 
+# Image cache
+backend/uploads/.cache/
+
 env_variables.json
 env_template.json

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { PhotoIcon, XMarkIcon, MapPinIcon, ChevronRightIcon, ChevronLeftIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../context/AuthContext';
 import api from '../lib/api';
+import imageCompression from 'browser-image-compression';
 
 export default function PostAdPage() {
   const { user } = useAuth();
@@ -85,12 +86,27 @@ export default function PostAdPage() {
       return setError(`Maximum ${maxImages} images allowed`);
     }
 
-    const uploadData = new FormData();
-    files.forEach(file => uploadData.append('images', file));
-
     try {
       setLoading(true);
       setError(null);
+
+      const compressionOptions = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+        fileType: 'image/webp'
+      };
+
+      const compressedFiles = await Promise.all(
+        files.map(file => imageCompression(file, compressionOptions))
+      );
+
+      const uploadData = new FormData();
+      compressedFiles.forEach(file => {
+        const renamedFile = new File([file], file.name.replace(/\.[^/.]+$/, '.webp'), { type: 'image/webp' });
+        uploadData.append('images', renamedFile);
+      });
+
       const { data } = await api.post('/upload', uploadData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
