@@ -5,7 +5,7 @@ import fs from 'fs';
 export const getResizedImage = async (req, res) => {
   try {
     const { filename } = req.params;
-    const { w, format } = req.query; // width, format
+    const { w } = req.query; // width
     const width = parseInt(w) || null;
 
     const uploadsDir = path.join(process.cwd(), 'uploads');
@@ -18,16 +18,14 @@ export const getResizedImage = async (req, res) => {
     let transform = sharp(filePath);
 
     if (width) {
+      // Fitcover or inside? Usually cover is best for static layouts.
       transform = transform.resize({ width, withoutEnlargement: true });
     }
 
-    if (format === 'avif') {
-      transform = transform.avif({ quality: 65 });
-      res.set('Content-Type', 'image/avif');
-    } else {
-      transform = transform.webp({ quality: 75 });
-      res.set('Content-Type', 'image/webp');
-    }
+    // Convert to webp with optimization
+    transform = transform.webp({ quality: 75 });
+
+    res.set('Content-Type', 'image/webp');
     res.set('Cache-Control', 'public, max-age=2592000, immutable'); // 30 days cache
 
     transform.pipe(res);

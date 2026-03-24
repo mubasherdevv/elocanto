@@ -36,10 +36,6 @@ export default function AdCard({ ad, initialFav = false, onFavToggle }) {
     ? `/api/images/${filename}?w=400`
     : (ad.images?.[0]?.startsWith('http') ? ad.images[0] : (ad.images?.[0] ? `http://localhost:5000${ad.images[0]}` : `https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&auto=format&fit=crop`));
 
-  const avifSrcSet = isLocalUpload
-    ? `/api/images/${filename}?w=200&format=avif 200w, /api/images/${filename}?w=400&format=avif 400w, /api/images/${filename}?w=600&format=avif 600w`
-    : undefined;
-
   const srcSet = isLocalUpload
     ? `/api/images/${filename}?w=200 200w, /api/images/${filename}?w=400 400w, /api/images/${filename}?w=600 600w`
     : undefined;
@@ -68,19 +64,17 @@ export default function AdCard({ ad, initialFav = false, onFavToggle }) {
     >
       {/* Square Image Container */}
       <div className="relative aspect-square bg-white flex items-center justify-center overflow-hidden flex-shrink-0">
-        <picture className="w-full h-full flex items-center justify-center">
-          {avifSrcSet && <source srcSet={avifSrcSet} type="image/avif" sizes="(max-width: 640px) 200px, 400px" />}
-          {srcSet && <source srcSet={srcSet} type="image/webp" sizes="(max-width: 640px) 200px, 400px" />}
-          <img
-            src={imageUrl}
-            alt={ad.title}
-            width="400"
-            height="400"
-            loading="lazy"
-            className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110 p-4"
-            onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400'; }}
-          />
-        </picture>
+        <img
+          src={imageUrl}
+          srcSet={srcSet}
+          sizes="(max-width: 640px) 200px, 400px"
+          alt={ad.title}
+          width="400"
+          height="400"
+          loading="lazy"
+          className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110 p-4"
+          onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400'; }}
+        />
         
         {/* Favorite btn overlay */}
         <button
