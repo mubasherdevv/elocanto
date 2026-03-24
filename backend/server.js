@@ -69,7 +69,16 @@ app.use('/api/images', imageRoutes);
 // Serve frontend in production
 if (process.env.NODE_ENV === 'production') {
   const frontendDistPath = path.join(__dirname2, '../frontend/dist');
-  app.use(express.static(frontendDistPath));
+  app.use(express.static(frontendDistPath, {
+    maxAge: '1y',
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith('.html')) {
+        res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+      } else {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      }
+    }
+  }));
   app.get('*', (req, res) =>
     res.sendFile(path.resolve(frontendDistPath, 'index.html'))
   );
