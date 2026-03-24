@@ -23,7 +23,7 @@ export default function HomePage() {
         setCategories(catRes.data);
         setCities(cityRes.data);
       } catch (err) {
-        // silenced in production
+        console.error(err);
       }
     };
     loadData();
@@ -39,7 +39,7 @@ export default function HomePage() {
       if (!localStorage.getItem('ad_viewer_id')) {
         localStorage.setItem('ad_viewer_id', viewerId);
       }
-      api.post('/views/track-bulk', { adIds, localStorageId: viewerId, page: 'homepage' }).catch(() => { });
+      api.post('/views/track-bulk', { adIds, localStorageId: viewerId, page: 'homepage' }).catch(console.error);
     }
   }, [featuredAds]);
 
@@ -142,10 +142,6 @@ export default function HomePage() {
         .marquee:hover {
           animation-play-state: paused;
         }
-          @keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
       `}</style>
 
       {/* Hero Section */}
@@ -254,19 +250,7 @@ export default function HomePage() {
           </div>
 
           {loading ? (
-            <div style={{ display: 'flex', gap: '24px', overflow: 'hidden', padding: '10px 4px 24px' }}>
-              {[...Array(5)].map((_, i) => (
-                <div key={i} style={{
-                  flexShrink: 0,
-                  width: 'calc(20% - 20px)',
-                  height: '280px',
-                  background: 'linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%)',
-                  backgroundSize: '200% 100%',
-                  borderRadius: '16px',
-                  animation: 'shimmer 1.5s infinite'
-                }} />
-              ))}
-            </div>
+            <div className="flex-center py-20"><div className="spinner"></div></div>
           ) : (
             <div className="hide-scroll scroll-container">
               {latestAds.slice(0, 10).map(ad => (

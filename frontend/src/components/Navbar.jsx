@@ -38,7 +38,7 @@ export default function Navbar() {
         {/* Logo */}
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 6, textDecoration: 'none', flexShrink: 0 }}>
           {settings?.logo ? (
-            <img src={settings.logo} alt={settings?.siteName || 'Logo'} width="120" height="40" fetchpriority="high" loading="eager" style={{ height: 40, objectFit: 'contain' }} />
+            <img src={settings.logo} alt={settings?.siteName || 'Logo'} style={{ height: 40, objectFit: 'contain' }} />
           ) : (
             <>
               <BuildingStorefrontIcon style={{ width: 28, height: 28, color: 'var(--primary)' }} />
@@ -67,7 +67,7 @@ export default function Navbar() {
                 }}
               >
                 {user.profilePhoto
-                  ? <img src={user.profilePhoto} alt={user.name} width="32" height="32" loading="lazy" decoding="async" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }} />
+                  ? <img src={user.profilePhoto} alt={user.name} style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }} />
                   : <UserCircleIcon style={{ width: 24, height: 24, color: 'var(--gray-600)' }} />
                 }
                 <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--gray-800)' }} className="hidden sm:block">

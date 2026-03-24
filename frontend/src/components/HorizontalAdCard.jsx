@@ -40,10 +40,8 @@ export default function HorizontalAdCard({ ad }) {
       <Link to={`/ads/${adSlug}`} style={{ flexShrink: 0, position: 'relative', width: 200, height: 180, borderRadius: 12, overflow: 'hidden' }}>
         <img
           src={image} alt={ad.title}
-          width="200" height="180"
           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           loading="lazy"
-          decoding="async"
         />
       </Link>
 
@@ -78,7 +76,7 @@ export default function HorizontalAdCard({ ad }) {
           {ad.category?.name && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#f8fafc', padding: '4px 12px', borderRadius: 999, border: '1px solid #e2e8f0' }}>
               <div style={{ width: 14, height: 14, borderRadius: '50%', overflow: 'hidden' }}>
-                <img src={ad.category.image || 'https://via.placeholder.com/20'} alt={ad.category.name} width="14" height="14" style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" decoding="async" />
+                <img src={ad.category.image || 'https://via.placeholder.com/20'} alt={ad.category.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
               </div>
               <span style={{ fontSize: 10, fontWeight: 800, color: '#64748b' }}>{ad.category.name}</span>
             </div>
