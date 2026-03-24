@@ -13,7 +13,7 @@ export default function HomePage() {
   useEffect(() => {
     fetchFeaturedAds();
     fetchLatestAds();
-    
+
     const loadData = async () => {
       try {
         const [catRes, cityRes] = await Promise.all([
@@ -23,7 +23,7 @@ export default function HomePage() {
         setCategories(catRes.data);
         setCities(cityRes.data);
       } catch (err) {
-        console.error(err);
+        // silenced in production
       }
     };
     loadData();
@@ -39,7 +39,7 @@ export default function HomePage() {
       if (!localStorage.getItem('ad_viewer_id')) {
         localStorage.setItem('ad_viewer_id', viewerId);
       }
-      api.post('/views/track-bulk', { adIds, localStorageId: viewerId, page: 'homepage' }).catch(console.error);
+      api.post('/views/track-bulk', { adIds, localStorageId: viewerId, page: 'homepage' }).catch(() => { });
     }
   }, [featuredAds]);
 
@@ -142,6 +142,10 @@ export default function HomePage() {
         .marquee:hover {
           animation-play-state: paused;
         }
+          @keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
       `}</style>
 
       {/* Hero Section */}
@@ -168,17 +172,17 @@ export default function HomePage() {
               <Link to={`/ads?category=${cat.slug}`} className="category-card">
                 <div className="category-blob">
                   {cat.image ? (
-                    <img 
-                      src={cat.image.startsWith('/uploads/') ? `/api/images/${cat.image.split('/').pop()}?w=120` : cat.image} 
+                    <img
+                      src={cat.image.startsWith('/uploads/') ? `/api/images/${cat.image.split('/').pop()}?w=120` : cat.image}
                       srcSet={cat.image.startsWith('/uploads/') ? `
                         /api/images/${cat.image.split('/').pop()}?w=120 120w,
                         /api/images/${cat.image.split('/').pop()}?w=240 240w
                       ` : undefined}
                       sizes="120px"
-                      alt={cat.name} 
-                      width="120" height="120" 
-                      loading={index < 3 ? "eager" : "lazy"} 
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                      alt={cat.name}
+                      width="120" height="120"
+                      loading={index < 3 ? "eager" : "lazy"}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
                   ) : <span style={{ fontSize: '2.5rem' }}>{cat.icon || '📦'}</span>}
                 </div>
@@ -199,17 +203,17 @@ export default function HomePage() {
                 <Link to={`/ads?city=${encodeURIComponent(city.name)}`} style={{ textDecoration: 'none', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
                   <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'linear-gradient(145deg, #ffffff, #f1f5f9)', boxShadow: '6px 6px 12px #e2e8f0, -6px -6px 12px #ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', border: city.isPopular ? '2px solid var(--primary)' : '2px solid transparent', transition: 'transform 0.2s' }} className="hover:scale-105">
                     {city.image ? (
-                      <img 
-                        src={city.image.startsWith('/uploads/') ? `/api/images/${city.image.split('/').pop()}?w=80` : city.image} 
+                      <img
+                        src={city.image.startsWith('/uploads/') ? `/api/images/${city.image.split('/').pop()}?w=80` : city.image}
                         srcSet={city.image.startsWith('/uploads/') ? `
                           /api/images/${city.image.split('/').pop()}?w=80 80w,
                           /api/images/${city.image.split('/').pop()}?w=160 160w
                         ` : undefined}
                         sizes="80px"
-                        alt={city.name} 
-                        width="80" height="80" 
-                        loading="lazy" 
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                        alt={city.name}
+                        width="80" height="80"
+                        loading="lazy"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       />
                     ) : <span style={{ fontSize: '1.5rem' }}>{city.isPopular ? '🌟' : '📍'}</span>}
                   </div>
@@ -229,7 +233,7 @@ export default function HomePage() {
               <h2 style={{ fontSize: 'clamp(20px, 4vw, 24px)', fontWeight: 900, color: 'var(--dark)' }}>Featured Ads</h2>
               <Link to="/ads?listingType=featured&page=1" style={{ color: 'var(--primary)', fontWeight: 700, fontSize: 13, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: 0.5 }}>VIEW ALL &rarr;</Link>
             </div>
-            
+
             <div className="hide-scroll scroll-container">
               {featuredAds.slice(0, 10).map(ad => (
                 <div key={ad._id} className="scroll-item-5">
@@ -248,9 +252,21 @@ export default function HomePage() {
             <h2 style={{ fontSize: 'clamp(20px, 4vw, 24px)', fontWeight: 900, color: 'var(--dark)' }}>Latest Recommendations</h2>
             <Link to="/ads?listingType=simple&page=1" style={{ color: 'var(--primary)', fontWeight: 700, fontSize: 13, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: 0.5 }}>VIEW ALL &rarr;</Link>
           </div>
-          
+
           {loading ? (
-            <div className="flex-center py-20"><div className="spinner"></div></div>
+            <div style={{ display: 'flex', gap: '24px', overflow: 'hidden', padding: '10px 4px 24px' }}>
+              {[...Array(5)].map((_, i) => (
+                <div key={i} style={{
+                  flexShrink: 0,
+                  width: 'calc(20% - 20px)',
+                  height: '280px',
+                  background: 'linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%)',
+                  backgroundSize: '200% 100%',
+                  borderRadius: '16px',
+                  animation: 'shimmer 1.5s infinite'
+                }} />
+              ))}
+            </div>
           ) : (
             <div className="hide-scroll scroll-container">
               {latestAds.slice(0, 10).map(ad => (

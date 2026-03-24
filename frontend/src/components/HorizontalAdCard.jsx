@@ -35,19 +35,21 @@ export default function HorizontalAdCard({ ad }) {
       borderRadius: 16, overflow: 'hidden', padding: 16, gap: 20, marginBottom: 16,
       boxShadow: '0 4px 12px rgba(0,0,0,0.02)'
     }} className="sm:flex-row flex-col flex card">
-      
+
       {/* Image Section */}
       <Link to={`/ads/${adSlug}`} style={{ flexShrink: 0, position: 'relative', width: 200, height: 180, borderRadius: 12, overflow: 'hidden' }}>
         <img
           src={image} alt={ad.title}
+          width="200" height="180"
           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           loading="lazy"
+          decoding="async"
         />
       </Link>
 
       {/* Content Section */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        
+
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
           <div style={{ flex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, background: 'var(--gray-50)', padding: '4px 10px', borderRadius: 8, width: 'fit-content' }}>
@@ -76,7 +78,7 @@ export default function HorizontalAdCard({ ad }) {
           {ad.category?.name && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#f8fafc', padding: '4px 12px', borderRadius: 999, border: '1px solid #e2e8f0' }}>
               <div style={{ width: 14, height: 14, borderRadius: '50%', overflow: 'hidden' }}>
-                <img src={ad.category.image || 'https://via.placeholder.com/20'} alt={ad.category.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
+                <img src={ad.category.image || 'https://via.placeholder.com/20'} alt={ad.category.name} width="14" height="14" style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" decoding="async" />
               </div>
               <span style={{ fontSize: 10, fontWeight: 800, color: '#64748b' }}>{ad.category.name}</span>
             </div>
