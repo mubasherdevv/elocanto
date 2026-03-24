@@ -47,9 +47,18 @@ app.use(cors());
 app.use(express.json());
 app.use(generalRateLimiter);
 
-// Serve uploaded files
+// Serve uploaded files with caching
 const __dirname2 = path.resolve();
-app.use('/uploads', express.static(path.join(__dirname2, 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname2, 'uploads'), {
+  maxAge: '30d',
+  etag: true,
+  lastModified: true,
+  setHeaders: (res, filePath) => {
+    if (filePath.includes('.cache')) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    }
+  }
+}));
 
 // API Routes
 app.use('/api/users', userRoutes);

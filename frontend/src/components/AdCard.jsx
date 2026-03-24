@@ -72,6 +72,7 @@ export default function AdCard({ ad, initialFav = false, onFavToggle }) {
           width="400"
           height="400"
           loading="lazy"
+          decoding="async"
           className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110 p-4"
           onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400'; }}
         />

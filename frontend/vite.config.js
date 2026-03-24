@@ -14,8 +14,31 @@ export default defineConfig({
   },
   build: {
     minify: 'terser',
+    target: 'esnext',
+    cssCodeSplit: true,
+    sourcemap: false,
+    chunkSizeWarningLimit: 500,
     terserOptions: {
-      compress: { drop_console: true, drop_debugger: true }
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+        passes: 2
+      },
+      mangle: true
+    },
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-motion': ['framer-motion'],
+          'vendor-charts': ['recharts'],
+          'vendor-icons': ['@heroicons/react'],
+          'vendor-editor': ['@tiptap/react', '@tiptap/starter-kit', 'react-quill-new'],
+        }
+      }
     }
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react-router-dom', 'axios']
   }
 })

@@ -1,9 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Suspense, lazy, useEffect } from 'react';
+import { Suspense, lazy } from 'react';
 import PublicLayout from './components/PublicLayout';
 import AdminLayout from './components/AdminLayout';
 import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
+import { PageSkeleton } from './components/Skeleton';
 
 import { AdProvider } from './context/AdContext';
 import { AuthProvider } from './context/AuthContext';
@@ -38,7 +39,7 @@ function App() {
         <AdProvider>
 
         <Router>
-          <Suspense fallback={<div style={{minHeight:'100vh'}} />}>
+          <Suspense fallback={<PageSkeleton />}>
             <Routes>
               {/* Marketplace Routes */}
               <Route element={<PublicLayout />}>

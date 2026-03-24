@@ -22,13 +22,22 @@
   <meta name="twitter:description" content="Pakistan's largest classified marketplace." />
   <meta name="twitter:image" content="https://olx.pk/og-image.jpg" />
 
-  <!-- Preconnect -->
+  <!-- Preconnect to critical origins -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-  <!-- Google Fonts -->
+  <!-- Google Fonts with display=swap for better performance -->
   <link rel="stylesheet" 
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" />
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" 
+    media="print" 
+    onload="this.media='all'" />
+  <noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
+  </noscript>
+
+  <!-- Preload critical JS chunks -->
+  <link rel="modulepreload" href="/src/main.jsx" />
+  <link rel="preload" as="script" href="/src/main.jsx" crossorigin />
 
   <!-- JSON-LD -->
   <script type="application/ld+json">

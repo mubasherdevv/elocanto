@@ -2,17 +2,33 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 import api from '../lib/api';
 
 const SettingsContext = createContext();
+const SETTINGS_CACHE_KEY = 'app_settings_cache';
+const SETTINGS_CACHE_TIME = 5 * 60 * 1000; // 5 minutes
 
 export const SettingsProvider = ({ children }) => {
-  const [settings, setSettings] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [settings, setSettings] = useState(() => {
+    try {
+      const cached = localStorage.getItem(SETTINGS_CACHE_KEY);
+      if (cached) {
+        const { data, timestamp } = JSON.parse(cached);
+        if (Date.now() - timestamp < SETTINGS_CACHE_TIME) {
+          return data;
+        }
+      }
+    } catch (e) {}
+    return null;
+  });
+  const [loading, setLoading] = useState(!settings);
   const [error, setError] = useState(null);
 
   const fetchSettings = async () => {
     try {
-      setLoading(true);
       const { data } = await api.get('/settings');
       setSettings(data);
+      localStorage.setItem(SETTINGS_CACHE_KEY, JSON.stringify({
+        data,
+        timestamp: Date.now()
+      }));
       setError(null);
     } catch (err) {
       console.error('Error fetching settings:', err);
@@ -23,7 +39,9 @@ export const SettingsProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    fetchSettings();
+    if (!settings) {
+      fetchSettings();
+    }
   }, []);
 
   // Update document title and favicon dynamically
