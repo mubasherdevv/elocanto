@@ -21,21 +21,9 @@ const timeAgo = (dateStr) => {
 };
 
 export default function HorizontalAdCard({ ad }) {
-  const isLocalUpload = ad.images?.[0]?.startsWith('/uploads/');
-  const filename = isLocalUpload ? ad.images[0].split('/').pop() : null;
-
-  const image = isLocalUpload
-    ? `/api/images/${filename}?w=400`
-    : (ad.images?.[0]?.startsWith('http') 
-        ? (ad.images[0].includes('images.unsplash.com') ? ad.images[0] : `/api/images/proxy?url=${encodeURIComponent(ad.images[0])}&w=400`)
-        : (ad.images?.[0] ? `http://localhost:5000${ad.images[0]}` : `https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&auto=format&fit=crop`));
-
-  const srcSet = isLocalUpload
-    ? `/api/images/${filename}?w=200 200w, /api/images/${filename}?w=400 400w, /api/images/${filename}?w=600 600w`
-    : (ad.images?.[0]?.startsWith('http') && !ad.images[0].includes('images.unsplash.com')
-        ? `/api/images/proxy?url=${encodeURIComponent(ad.images[0])}&w=200 200w, /api/images/proxy?url=${encodeURIComponent(ad.images[0])}&w=400 400w, /api/images/proxy?url=${encodeURIComponent(ad.images[0])}&w=600 600w`
-        : undefined);
-
+  const image = ad.images?.[0]
+    ? (ad.images[0].startsWith('http') ? ad.images[0] : `http://localhost:5000${ad.images[0]}`)
+    : `https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&auto=format&fit=crop`;
 
   const adSlug = generateAdSlug(ad);
 
@@ -51,10 +39,7 @@ export default function HorizontalAdCard({ ad }) {
       {/* Image Section */}
       <Link to={`/ads/${adSlug}`} style={{ flexShrink: 0, position: 'relative', width: 200, height: 180, borderRadius: 12, overflow: 'hidden' }}>
         <img
-          src={image}
-          srcSet={srcSet}
-          sizes="(max-width: 640px) 200px, 400px"
-          alt={ad.title}
+          src={image} alt={ad.title}
           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           loading="lazy"
         />
